@@ -408,7 +408,7 @@ public class Horde {
         int selected = -1;
         int counter = 0;
         for(Integer weights : SpawnWeights){
-            if ((rng - weights) <= 0){
+            if ((rng + 1 - weights) <= 0){
                 selected = counter;
                 break;
             }else counter++; rng -= weights;
