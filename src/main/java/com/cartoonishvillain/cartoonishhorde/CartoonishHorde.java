@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 @Mod("cartoonishhorde")
 public class CartoonishHorde
 {
+    Horde horde;
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -41,5 +42,32 @@ public class CartoonishHorde
 
     private void doClientStuff(final FMLClientSetupEvent event) {
 
+    }
+
+    @SubscribeEvent
+    public void onServerStarting(ServerStartingEvent event) {
+        //Step 2 - Instantiate
+        horde = new Horde(event.getServer());
+        //This horde will consist of spiders, evokers, and creepers. Roughly equal quantities, but this is psuedo-randomized, so results may vary.
+        horde.setHordeData(new EntityHordeData<>(2, 1, 1, EntityType.SPIDER, Spider.class),
+                new EntityHordeData<>(2, 1, 1, EntityType.EVOKER, Evoker.class),
+                new EntityHordeData<>(2, 1, 1, EntityType.CREEPER, Creeper.class));
+    }
+
+    @SubscribeEvent
+    public void onWorldTick(TickEvent.WorldTickEvent event) {
+        if(!event.world.isClientSide && horde != null) {
+            //Step 3 - Connect
+            horde.tick();
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerJump(LivingEvent.LivingJumpEvent event) {
+        if(event.getEntityLiving() instanceof Player && !event.getEntityLiving().level.isClientSide && horde != null && !horde.getHordeActive()) {
+            //Step 4 - Start.
+            //This will start this test horde whenever it is not ongoing an a player jumps.
+            horde.SetUpHorde((ServerPlayer) event.getEntityLiving());
+        }
     }
 }
