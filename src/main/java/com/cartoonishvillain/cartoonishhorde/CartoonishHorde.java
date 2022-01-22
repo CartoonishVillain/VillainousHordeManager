@@ -49,9 +49,7 @@ public class CartoonishHorde
         //Step 2 - Instantiate
         horde = new Horde(event.getServer());
         //This horde will consist of spiders, evokers, and creepers. Roughly equal quantities, but this is psuedo-randomized, so results may vary.
-        horde.setHordeData(new EntityHordeData<>(2, 1, 1, EntityType.SPIDER, Spider.class),
-                new EntityHordeData<>(2, 1, 1, EntityType.EVOKER, Evoker.class),
-                new EntityHordeData<>(2, 1, 1, EntityType.CREEPER, Creeper.class));
+        horde.setHordeData(new EntityHordeData<>(2, 1, 1, EntityType.SPIDER, Spider.class));
     }
 
     @SubscribeEvent

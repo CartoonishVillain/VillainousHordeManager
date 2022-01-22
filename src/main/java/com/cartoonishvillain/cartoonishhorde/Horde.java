@@ -165,6 +165,20 @@ public class Horde {
     }
 
     /*
+        Usage: Automatically updates the horde center position
+    */
+    private void updateCenter() {
+        if (updateCenter == 0) {
+            center = hordeAnchorPlayer.blockPosition();
+            updateCenter = 100;
+            updatePlayers();
+            updateHorde();
+        } else {
+            updateCenter--;
+        }
+    }
+
+    /*
         Usage: The tick event. The heart and soul of the horde. Patch your version of the tick event into the world tick to allow the horde to function when activated!
         Additional Notes: For additional or generally different functionality you can override this
      */
@@ -191,14 +205,7 @@ public class Horde {
                         }
                     }
 
-                    if (updateCenter == 0) {
-                        center = hordeAnchorPlayer.blockPosition();
-                        updateCenter = 100;
-                        updatePlayers();
-                        updateHorde();
-                    } else {
-                        updateCenter--;
-                    }
+                    updateCenter();
 
                     float aliveDivision = ((float) Alive / initAlive);
                     this.bossInfo.setProgress( Mth.clamp(aliveDivision, 0.0f, 1f));
@@ -307,16 +314,14 @@ public class Horde {
      */
     @Nullable
     private BlockPos findRandomSpawnPos(int logicvar, int loopvar){
-        int i = logicvar == 0 ? 2 : 2 - logicvar;
         BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
 
         for(int a = 0; a < loopvar; ++a){
-            float f = this.world.random.nextFloat() * ((float)Math.PI * 2F);
             double DISTANCE = -1;
             int j = Integer.MAX_VALUE, l = Integer.MAX_VALUE;
             while ((DISTANCE == -1 || !(DISTANCE > 450 && DISTANCE < 1250))){ //check for appropriate distance from start and proper biome
-                j = randFinder(this.center.getX(), f, i);
-                l = randFinder(this.center.getZ(), f, i);
+                j = randFinder(this.center.getX());
+                l = randFinder(this.center.getZ());
                 DISTANCE = center.distSqr(new BlockPos(j, center.getY(), l));}
 
 //            int k = this.world.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, j, l);
@@ -371,7 +376,7 @@ public class Horde {
         return -1;
     }
 
-    private int randFinder(int centercoord, float f, int i){return centercoord + (this.world.random.nextInt(25+25) - 25);}
+    private int randFinder(int centercoord){return centercoord + (this.world.random.nextInt(25+25) - 25);}
 
     //when a horde member spawns
     public void SpawnUnit(){
