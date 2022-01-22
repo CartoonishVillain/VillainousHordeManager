@@ -23,8 +23,7 @@ public class CartoonishHorde
 {
     Horde horde;
     public static final String MOD_ID = "cartoonishhorde";
-    // Directly reference a log4j logger.
-    private static final Logger LOGGER = LogManager.getLogger();
+
 
     public CartoonishHorde() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);

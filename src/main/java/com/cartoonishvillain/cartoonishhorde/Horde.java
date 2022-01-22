@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import org.jline.utils.Log;
 
 
 import javax.annotation.Nullable;
@@ -46,6 +47,7 @@ public class Horde {
     public enum HordeStopReasons {
         VICTORY, //Players beat the event
         DEFEAT, //Players are defeated or quit the event.
+        PEACEFUL, //Server changed to peaceful mid horde, event canceled.
         SPAWN_ERROR  //Players are in a position that causes the spawn manager to panic and shut down the event before it hangs the server.
     }
 
@@ -62,7 +64,7 @@ public class Horde {
         Usage: Clears out all data for a given horde and ends it.
         Additional Notes: You would want to override this to clean up any additional information you're tracking.
      */
-    public void Stop() {
+    public void Stop(HordeStopReasons stopReason) {
         this.bossInfo.setVisible(false);
         bossInfo.removeAllPlayers();
         hordeActive = false;
@@ -73,6 +75,20 @@ public class Horde {
         activeHordeMembers.clear();
         center = null;
         players.clear();
+
+        switch (stopReason) {
+            case VICTORY -> {
+                Log.info("Player Victory against Horde");
+            }
+            case DEFEAT -> {
+                Log.info("Player Defeat against Horde");
+            } case SPAWN_ERROR ->  {
+                Log.error("Horde canceled! Could not locate spawn placement! (Entities are too big, or terrain is too noisy)");
+            }
+            case PEACEFUL -> {
+                Log.info("Horde canceled, server changed to peaceful!");
+            }
+        }
 
     }
 
@@ -96,7 +112,6 @@ public class Horde {
         if (serverPlayer.level.dimension().equals(world.dimension())) {
             hordeAnchorPlayer = serverPlayer;
             //Set alive counter based on difficulty
-
             switch (world.getDifficulty()) {
                 case EASY:
                     setEasyDifficultyStats();
@@ -107,6 +122,8 @@ public class Horde {
                 case HARD:
                     setHardDifficultyStats();
                     break;
+                case PEACEFUL:
+                    return;
             }
 
             setActiveMemberCount();
@@ -171,7 +188,7 @@ public class Horde {
      */
     private void PeacefulCheck() {
         if (this.world.getDifficulty() == Difficulty.PEACEFUL) {
-            this.Stop();
+            this.Stop(HordeStopReasons.PEACEFUL);
         }
     }
 
@@ -201,6 +218,7 @@ public class Horde {
                     boolean flag = this.hordeActive;
 
                     PeacefulCheck();
+                    if(!hordeActive) return;
 
                     //Keeps Active counter updated
                     if (Active != activeHordeMembers.size()) {
@@ -224,7 +242,7 @@ public class Horde {
                     //look for viable player, or cancel.
                     updatePlayers();
                     if (players.size() == 0) {
-                        this.Stop();
+                        this.Stop(HordeStopReasons.DEFEAT);
                     } else {
                         bossInfo.removePlayer(hordeAnchorPlayer);
                         hordeAnchorPlayer = players.get(0);
@@ -232,7 +250,7 @@ public class Horde {
                     }
                 }
             } else {
-                this.Stop();
+                this.Stop(HordeStopReasons.VICTORY);
             }
         }
     }
@@ -489,7 +507,7 @@ public class Horde {
             hordeSpawn = this.getValidSpawn(2, entrySelected.getType());
             attempts++;
             if (hordeSpawn.isEmpty() && attempts >= 5) {
-                this.Stop();
+                this.Stop(HordeStopReasons.SPAWN_ERROR);
                 return;
             }
         }
