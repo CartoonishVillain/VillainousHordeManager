@@ -3,9 +3,7 @@ package com.cartoonishvillain.cartoonishhorde;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.Evoker;
-import net.minecraft.world.entity.monster.Spider;
+import net.minecraft.world.entity.monster.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -24,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 public class CartoonishHorde
 {
     Horde horde;
+    public static final String MOD_ID = "cartoonishhorde";
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -49,7 +48,7 @@ public class CartoonishHorde
         //Step 2 - Instantiate
         horde = new Horde(event.getServer());
         //This horde will consist of spiders, evokers, and creepers. Roughly equal quantities, but this is psuedo-randomized, so results may vary.
-        horde.setHordeData(new EntityHordeData<>(2, 1, 1, EntityType.SPIDER, Spider.class));
+        horde.setHordeData(new EntityHordeData<>(2, 1, 1, EntityType.GIANT, Giant.class));
     }
 
     @SubscribeEvent
