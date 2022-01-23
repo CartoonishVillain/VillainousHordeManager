@@ -14,12 +14,12 @@ This however is not absolutely required. You are free to copy and paste code whi
 
 By contributing to this repository you agree to have your code under the license found in the file LICENSE.
 
-#Warning! This library is under testing at the moment. Things may be quite unstable. Check back later for a better experience!
+# Warning! This library is under testing at the moment. Things may be quite unstable. Check back later for a better experience!
 
-##Step 1 - Installation
+## Step 1 - Installation
 Working on a proper installation method and example. An example exists in the 1.18-Example branch, but frankly one as a seperate mod would be better
 
-##Step 2 - Instantiation
+## Step 2 - Instantiation
 Instantiate the Horde object (Or make your own extension of it and instantiate that) in your
 main mod file. We recommend you instantiate the object with the ServerStartingEvent.
 
@@ -36,10 +36,10 @@ Class<T> entityClass - The class of the entity you're putting into the horde
 
 double goalMovementSpeed - The movement speed multiplier you want applied to the convergence of horde entities.
 
-##Step 3 - Connect
+## Step 3 - Connect
 Attach the horde instance's tick() method to a tick event. Preferably, the world tick event.
 
-##Step 4 - Start
+## Step 4 - Start
 Start the horde event you have crafted by running SetUpHorde(<ServerPlayer>) where the ServerPlayer is who the event will be tracking first.
 
 Example:
