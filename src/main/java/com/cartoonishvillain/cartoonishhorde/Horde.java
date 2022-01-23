@@ -14,7 +14,6 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
-import net.minecraft.world.entity.raid.Raid;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,20 +28,20 @@ import java.util.*;
 //TODO: Make a generic system for every mod that wants to use can use.
 
 public class Horde {
-    private ServerLevel world;
-    private BlockPos center;
-    private Boolean hordeActive = false;
-    private MinecraftServer server;
-    private int Alive = 0;
-    private int initAlive = 0;
-    private int Active = 0;
-    private int allowedActive = 0;
-    private int updateCenter = 0;
-    private ServerPlayer hordeAnchorPlayer;
-    private ArrayList<ServerPlayer> players = new ArrayList<>();
-    private ArrayList<LivingEntity> activeHordeMembers = new ArrayList<>();
-    private final ServerBossEvent bossInfo = new ServerBossEvent(new TextComponent("Horde"), BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.PROGRESS);
-    private ArrayList<EntityHordeData> hordeData = new ArrayList<>();
+    protected ServerLevel world;
+    protected BlockPos center;
+    protected Boolean hordeActive = false;
+    protected MinecraftServer server;
+    protected int Alive = 0;
+    protected int initAlive = 0;
+    protected int Active = 0;
+    protected int allowedActive = 0;
+    protected int updateCenter = 0;
+    protected ServerPlayer hordeAnchorPlayer;
+    protected ArrayList<ServerPlayer> players = new ArrayList<>();
+    protected ArrayList<LivingEntity> activeHordeMembers = new ArrayList<>();
+    protected final ServerBossEvent bossInfo = new ServerBossEvent(new TextComponent("Horde"), BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.PROGRESS);
+    protected ArrayList<EntityHordeData> hordeData = new ArrayList<>();
 
     public enum HordeStopReasons {
         VICTORY, //Players beat the event
@@ -179,14 +178,14 @@ public class Horde {
         Usage: Checks if a given player is still properly alive. This is to avoid desync issues.
         Parameter Details: ServerPlayer to check.
      */
-    private boolean checkIfPlayerIsStillValid(ServerPlayer serverPlayer) {
+    protected boolean checkIfPlayerIsStillValid(ServerPlayer serverPlayer) {
         return serverPlayer.getHealth() != 0.0f && !serverPlayer.isRemoved();
     }
 
     /*
         Usage: Checks during tick if peaceful difficulty is set. If it is, the horde is automatically ended.
      */
-    private void PeacefulCheck() {
+    protected void PeacefulCheck() {
         if (this.world.getDifficulty() == Difficulty.PEACEFUL) {
             this.Stop(HordeStopReasons.PEACEFUL);
         }
@@ -195,7 +194,7 @@ public class Horde {
     /*
         Usage: Automatically updates the horde center position
     */
-    private void updateCenter() {
+    protected void updateCenter() {
         if (updateCenter == 0) {
             center = hordeAnchorPlayer.getOnPos();
             updateCenter = 100;
@@ -255,7 +254,7 @@ public class Horde {
         }
     }
 
-    private void updatePlayers() {
+    protected void updatePlayers() {
         for (ServerPlayer serverPlayer : server.getPlayerList().getPlayers()) {
             if (this.hordeAnchorPlayer == serverPlayer) {
                 bossInfo.addPlayer(serverPlayer);
@@ -285,7 +284,7 @@ public class Horde {
     /*
         Usage: Takes stock of the status of horde members. Removes missing and dead members and updates tallies accordingly.
      */
-    private void updateHorde() {
+    protected void updateHorde() {
         ArrayList<LivingEntity> removals = new ArrayList<>();
         ArrayList<LivingEntity> additions = new ArrayList<>();
         for (LivingEntity hordeMember : activeHordeMembers) {
@@ -320,7 +319,7 @@ public class Horde {
         Invites nearby compatible entity types to join
         Temporarily? disabled.
      */
-//    private void inviteNearbySnowmentoHorde(GenericHordeMember Member, ArrayList<GenericHordeMember> additions){
+//    protected void inviteNearbySnowmentoHorde(GenericHordeMember Member, ArrayList<GenericHordeMember> additions){
 //        List<GenericHordeMember> list = Member.level.getEntitiesOfClass(GenericHordeMember.class, Member.getBoundingBox().inflate(8));
 //        for(GenericHordeMember snowman : list){
 //            if(Member.getLocTarget() != null) {
@@ -336,7 +335,7 @@ public class Horde {
     /*
         Usage: Begins the search for a valid spawnpoint for horde members.
      */
-    private Optional<BlockPos> getValidSpawn(int var, EntityType type) {
+    protected Optional<BlockPos> getValidSpawn(int var, EntityType type) {
         for (int i = 0; i < 3; ++i) {
             BlockPos blockPos = this.findRandomSpawnPos(5, type);
             if (blockPos != null) return Optional.of(blockPos);
@@ -348,7 +347,7 @@ public class Horde {
         Usage: Finds the random spawn position for horde members
      */
     @Nullable
-    private BlockPos findRandomSpawnPos(int loopvar, EntityType type) {
+    protected BlockPos findRandomSpawnPos(int loopvar, EntityType type) {
         BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
 
         for (int a = 0; a < loopvar; ++a) {
@@ -390,7 +389,7 @@ public class Horde {
     /*
         Usage: Finds the y spawnpoint for horde members.
      */
-    private int findSafeYPosition(int xValue, int zValue, EntityType entityType, boolean unfiltered) {
+    protected int findSafeYPosition(int xValue, int zValue, EntityType entityType, boolean unfiltered) {
         int height = Mth.ceil(entityType.getDimensions().height);
         int width = Mth.ceil(entityType.getDimensions().width);
         int maxHeight;
@@ -451,7 +450,7 @@ public class Horde {
         return world.getMinBuildHeight() - 1;
     }
 
-    private int randFinder(int centercoord) {
+    protected int randFinder(int centercoord) {
         return centercoord + (this.world.random.nextInt(25 + 25) - 25);
     }
 
@@ -479,7 +478,7 @@ public class Horde {
     /*
         Usage: Spawns horde entities.
      */
-    private void spawnHordeMember() {
+    protected void spawnHordeMember() {
         Optional<BlockPos> hordeSpawn = Optional.empty();
         ArrayList<Integer> SpawnWeights = new ArrayList<>();
         for (EntityHordeData hordeEntry : hordeData) {
