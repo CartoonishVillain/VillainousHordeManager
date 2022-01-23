@@ -1,4 +1,6 @@
 # VillainousHordeLibrary
+
+ Looking for the fabric version? Here it is! (It's essentially the same thing, but the example/test mod is different)
  A library for folks who want to include Raid-like events!
 
  This library is work in progress! Feel free to contribute! Please try to stay within the spec guidelines <Link here>.
