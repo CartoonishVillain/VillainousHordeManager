@@ -1,6 +1,8 @@
-package com.cartoonishvillain.cartoonishhorde;
+package com.villain.cartoonishhorde;
 
 
+import com.villain.cartoonishhorde.mixin.AvailableGoalsAccessor;
+import com.villain.cartoonishhorde.mixin.LivingGoalAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
@@ -10,22 +12,18 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import org.jline.utils.Log;
+import org.jetbrains.annotations.Nullable;
 
-
-import javax.annotation.Nullable;
 import java.util.*;
-
-//This code was basically ripped from Cold Snap Horde.
-//TODO: Make a generic system for every mod that wants to use can use.
 
 public class Horde {
     protected ServerLevel world;
@@ -77,15 +75,15 @@ public class Horde {
 
         switch (stopReason) {
             case VICTORY -> {
-                Log.info("Player Victory against Horde");
+                Constants.LOG.info("Player Victory against Horde");
             }
             case DEFEAT -> {
-                Log.info("Player Defeat against Horde");
+                Constants.LOG.info("Player Defeat against Horde");
             } case SPAWN_ERROR ->  {
-                Log.error("Horde canceled! Could not locate spawn placement! (Entities are too big, or terrain is too noisy)");
+                Constants.LOG.error("Horde canceled! Could not locate spawn placement! (Entities are too big, or terrain is too noisy)");
             }
             case PEACEFUL -> {
-                Log.info("Horde canceled, server changed to peaceful!");
+                Constants.LOG.info("Horde canceled, server changed to peaceful!");
             }
         }
 
@@ -363,7 +361,7 @@ public class Horde {
             int k = findSafeYPosition(j, l, type, false);
             if (k != world.getMinBuildHeight() - 1) {
                 blockPos.set(j, k, l);
-                if (this.world.isAreaLoaded(blockPos, 20)) return blockPos;
+                return blockPos;
             }
         }
 
@@ -380,7 +378,7 @@ public class Horde {
         int k = findSafeYPosition(j, l, type, true);
         if (k != world.getMinBuildHeight() - 1) {
             blockPos.set(j, k, l);
-            if (this.world.isAreaLoaded(blockPos, 20)) return blockPos;
+            return blockPos;
         }
         return null;
     }
@@ -540,14 +538,16 @@ public class Horde {
         Usage: Injects the horde movement and swarming goal into the entity.
      */
     public void injectGoal(PathfinderMob entity, EntityHordeData entityHordeData, double movementSpeedModifier) {
-        entity.goalSelector.addGoal(entityHordeData.getGoalPriority(), new HordeMovementGoal<>(entity, this, movementSpeedModifier));
+        GoalSelector mobGoalSelector = ((LivingGoalAccessor) entity).cartoonishHordeGetMobGoalSelector();
+        mobGoalSelector.addGoal(entityHordeData.getGoalPriority(), new HordeMovementGoal<>(entity, this, movementSpeedModifier));
     }
 
     /*
         Usage: removes the horde movement and swarming goal from the entity.
      */
     public static void removeGoal(PathfinderMob entity) {
-        Set<WrappedGoal> prioritizedGoals = ObfuscationReflectionHelper.getPrivateValue(GoalSelector.class, entity.goalSelector, "f_25345_");
+        GoalSelector mobGoalSelector = ((LivingGoalAccessor) entity).cartoonishHordeGetMobGoalSelector();
+        Set<WrappedGoal> prioritizedGoals = ((AvailableGoalsAccessor) mobGoalSelector).cartoonishHordeGetAvailableGoals();
         Goal toremove = null;
         if (prioritizedGoals != null) {
             for (WrappedGoal prioritizedGoal : prioritizedGoals) {
@@ -557,7 +557,7 @@ public class Horde {
                 }
             }
             if (toremove != null) {
-                entity.goalSelector.removeGoal(toremove);
+                mobGoalSelector.removeGoal(toremove);
             }
         }
     }

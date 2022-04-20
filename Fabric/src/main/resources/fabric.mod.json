@@ -1,0 +1,35 @@
+{
+    "schemaVersion": 1,
+    "id": "cartoonishhorde",
+    "version": "${version}",
+  
+    "name": "Villainous Horde Library",
+    "description": "A library mod for Continuous Assault Events",
+    "authors": [
+      "Cartoonish Villain"
+    ],
+    "contact": {
+    },
+  
+    "license": "MIT",
+    "icon": "assets/modid/icon.png",
+  
+    "environment": "*",
+    "entrypoints": {
+      "main": [
+        "com.villain.cartoonishhorde.FabricCartoonishHorde"
+      ]
+    },
+    "mixins": [
+      "cartoonishhorde.mixins.json",
+      "cartoonishhorde.fabric.mixins.json"
+    ],
+  
+    "depends": {
+      "fabricloader": ">=0.12",
+      "fabric": "*",
+      "minecraft": "1.18.x",
+      "java": ">=17"
+    }
+  }
+  

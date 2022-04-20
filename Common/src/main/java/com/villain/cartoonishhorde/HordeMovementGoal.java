@@ -1,4 +1,4 @@
-package com.cartoonishvillain.cartoonishhorde;
+package com.villain.cartoonishhorde;
 
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
