@@ -21,7 +21,6 @@ import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -344,7 +343,6 @@ public class Horde {
     /*
         Usage: Finds the random spawn position for horde members
      */
-    @Nullable
     protected BlockPos findRandomSpawnPos(int loopvar, EntityType type) {
         BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
 
