@@ -2,22 +2,11 @@ package com.villain.cartoonishhorde;
 
 import com.villain.cartoonishhorde.mixin.AvailableGoalsAccessor;
 import com.villain.cartoonishhorde.mixin.LivingGoalAccessor;
-import com.villain.cartoonishhorde.platform.Services;
-import net.minecraft.core.Registry;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
-import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Set;
 
 public class CommonCartoonishHorde {

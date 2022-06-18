@@ -4,7 +4,7 @@ package com.villain.cartoonishhorde;
 import com.villain.cartoonishhorde.mixin.AvailableGoalsAccessor;
 import com.villain.cartoonishhorde.mixin.LivingGoalAccessor;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
@@ -37,7 +37,7 @@ public class Horde {
     protected ServerPlayer hordeAnchorPlayer;
     protected ArrayList<ServerPlayer> players = new ArrayList<>();
     protected ArrayList<LivingEntity> activeHordeMembers = new ArrayList<>();
-    protected final ServerBossEvent bossInfo = new ServerBossEvent(new TextComponent("Horde"), BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.PROGRESS);
+    protected final ServerBossEvent bossInfo = new ServerBossEvent(Component.literal("Horde"), BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.PROGRESS);
     protected ArrayList<EntityHordeData> hordeData = new ArrayList<>();
 
     public enum HordeStopReasons {
