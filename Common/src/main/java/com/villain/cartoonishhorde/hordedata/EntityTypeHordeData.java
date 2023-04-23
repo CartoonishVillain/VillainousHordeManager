@@ -1,4 +1,4 @@
-package com.villain.cartoonishhorde;
+package com.villain.cartoonishhorde.hordedata;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
@@ -7,19 +7,19 @@ import net.minecraft.world.entity.PathfinderMob;
 /*
     Used to store data about horde members in a map. Including spawn weight and goal priority to move towards the center.
  */
-public class EntityHordeData<T extends PathfinderMob> {
-    private final int goalPriority;
-    private final int SpawnWeight;
-    private final EntityType type;
+public class EntityTypeHordeData<T extends PathfinderMob> implements HordeData {
+    private final EntityType<T> type;
     private final Class<T> entityClass;
     private final double goalMovementSpeed;
+    private final int goalPriority;
+    private final int spawnWeight;
 
-    public EntityHordeData(int goalPriority, double goalMovementSpeed, int SpawnWeight, EntityType type, Class<T> entityClass){
+    public EntityTypeHordeData(int goalPriority, double goalMovementSpeed, int spawnWeight, EntityType<T> type, Class<T> entityClass){
         this.goalPriority = goalPriority;
-        this.SpawnWeight = SpawnWeight;
+        this.goalMovementSpeed = goalMovementSpeed;
+        this.spawnWeight = spawnWeight;
         this.type = type;
         this.entityClass = entityClass;
-        this.goalMovementSpeed = goalMovementSpeed;
     }
 
     public double getGoalMovementSpeed() {
@@ -31,10 +31,10 @@ public class EntityHordeData<T extends PathfinderMob> {
     }
 
     public int getSpawnWeight() {
-        return SpawnWeight;
+        return spawnWeight;
     }
 
-    public EntityType getType() {
+    public EntityType<T> getType() {
         return type;
     }
 
@@ -43,7 +43,6 @@ public class EntityHordeData<T extends PathfinderMob> {
     }
 
     public T createInstance(ServerLevel level) {
-        T instance = (T) type.create(level);
-        return instance;
+        return (T) type.create(level);
     }
 }

@@ -10,10 +10,10 @@ import java.util.EnumSet;
 //based on move towards raid goal
 public class HordeMovementGoal<T extends PathfinderMob> extends Goal {
     private final T Member;
-    private final Horde hordeInstance;
+    private final EntityTypeHorde hordeInstance;
     private final double movementModifier;
 
-    public HordeMovementGoal(T member, Horde hordeInstance, Double movementModifier){
+    public HordeMovementGoal(T member, EntityTypeHorde hordeInstance, Double movementModifier){
         this.Member = member;
         this.hordeInstance = hordeInstance;
         this.movementModifier = movementModifier;

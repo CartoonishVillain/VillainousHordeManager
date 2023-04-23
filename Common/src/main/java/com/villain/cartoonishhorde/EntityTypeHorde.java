@@ -1,6 +1,7 @@
 package com.villain.cartoonishhorde;
 
 
+import com.villain.cartoonishhorde.hordedata.EntityTypeHordeData;
 import com.villain.cartoonishhorde.mixin.AvailableGoalsAccessor;
 import com.villain.cartoonishhorde.mixin.LivingGoalAccessor;
 import net.minecraft.core.BlockPos;
@@ -24,7 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.*;
 
-public class Horde {
+public class EntityTypeHorde {
     protected ServerLevel world;
     protected BlockPos center;
     protected Boolean hordeActive = false;
@@ -37,8 +38,8 @@ public class Horde {
     protected ServerPlayer hordeAnchorPlayer;
     protected ArrayList<ServerPlayer> players = new ArrayList<>();
     protected ArrayList<LivingEntity> activeHordeMembers = new ArrayList<>();
-    protected final ServerBossEvent bossInfo = new ServerBossEvent(Component.literal("Horde"), BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.PROGRESS);
-    protected ArrayList<EntityHordeData> hordeData = new ArrayList<>();
+    protected final ServerBossEvent bossInfo = new ServerBossEvent(Component.literal("EntityTypeHorde"), BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.PROGRESS);
+    protected ArrayList<EntityTypeHordeData> hordeData = new ArrayList<>();
 
     public enum HordeStopReasons {
         VICTORY, //Players beat the event
@@ -48,10 +49,10 @@ public class Horde {
     }
 
     /*
-        Usage: Constructor for the Horde system.
+        Usage: Constructor for the EntityTypeHorde system.
         Parameter Details: a MinecraftServer instance helps the horde system keep track of players who should be involved in the horde process.
      */
-    public Horde(MinecraftServer server) {
+    public EntityTypeHorde(MinecraftServer server) {
         this.server = server;
     }
 
@@ -74,15 +75,15 @@ public class Horde {
 
         switch (stopReason) {
             case VICTORY -> {
-                Constants.LOG.info("Player Victory against Horde");
+                Constants.LOG.info("Player Victory against EntityTypeHorde");
             }
             case DEFEAT -> {
-                Constants.LOG.info("Player Defeat against Horde");
+                Constants.LOG.info("Player Defeat against EntityTypeHorde");
             } case SPAWN_ERROR ->  {
-                Constants.LOG.error("Horde canceled! Could not locate spawn placement! (Entities are too big, or terrain is too noisy)");
+                Constants.LOG.error("EntityTypeHorde canceled! Could not locate spawn placement! (Entities are too big, or terrain is too noisy)");
             }
             case PEACEFUL -> {
-                Constants.LOG.info("Horde canceled, server changed to peaceful!");
+                Constants.LOG.info("EntityTypeHorde canceled, server changed to peaceful!");
             }
         }
 
@@ -97,7 +98,7 @@ public class Horde {
 
 
     /*
-        Usage: Initial phase. The Horde targets a specific player as it's anchor point (where horde members approach, and base their spawning off of)
+        Usage: Initial phase. The EntityTypeHorde targets a specific player as it's anchor point (where horde members approach, and base their spawning off of)
         Parameter Details: A server player entity for the horde to track.
         Additional Notes: Now would be a good time to set up additional information to track if needed.
 
@@ -300,10 +301,6 @@ public class Horde {
                 removals.add(hordeMember);
                 UnitLost();
             }
-
-
-            //Temporarily? disabled.
-//            inviteNearbySnowmentoHorde(hordeMember, additions);
         }
         for (LivingEntity removal : removals) {
             activeHordeMembers.remove(removal);
@@ -312,22 +309,6 @@ public class Horde {
         removals.clear();
     }
 
-    /*
-        Invites nearby compatible entity types to join
-        Temporarily? disabled.
-     */
-//    protected void inviteNearbySnowmentoHorde(GenericHordeMember Member, ArrayList<GenericHordeMember> additions){
-//        List<GenericHordeMember> list = Member.level.getEntitiesOfClass(GenericHordeMember.class, Member.getBoundingBox().inflate(8));
-//        for(GenericHordeMember snowman : list){
-//            if(Member.getLocTarget() != null) {
-//                if (!snowman.isHordeMember() && snowman.getTarget() == null) {
-//                    snowman.toggleHordeMember(Member.getLocTarget());
-//                    additions.add(snowman);
-//                    InviteUnit();
-//                }
-//            }
-//        }
-//    }
 
     /*
         Usage: Begins the search for a valid spawnpoint for horde members.
@@ -477,7 +458,7 @@ public class Horde {
     protected void spawnHordeMember() {
         Optional<BlockPos> hordeSpawn = Optional.empty();
         ArrayList<Integer> SpawnWeights = new ArrayList<>();
-        for (EntityHordeData hordeEntry : hordeData) {
+        for (EntityTypeHordeData hordeEntry : hordeData) {
             SpawnWeights.add(hordeEntry.getSpawnWeight());
         }
         int combined = 0;
@@ -494,7 +475,7 @@ public class Horde {
             rng -= weights;
         }
 
-        EntityHordeData entrySelected = hordeData.get(selected);
+        EntityTypeHordeData entrySelected = hordeData.get(selected);
         PathfinderMob pathfinderMob = entrySelected.createInstance(world);
 
         int attempts = 0;
@@ -519,7 +500,7 @@ public class Horde {
     }
 
     /*
-        Usage: Returns the center of the Horde.
+        Usage: Returns the center of the EntityTypeHorde.
      */
     public BlockPos getCenter() {
         return center;
@@ -535,7 +516,7 @@ public class Horde {
     /*
         Usage: Injects the horde movement and swarming goal into the entity.
      */
-    public void injectGoal(PathfinderMob entity, EntityHordeData entityHordeData, double movementSpeedModifier) {
+    public void injectGoal(PathfinderMob entity, EntityTypeHordeData entityHordeData, double movementSpeedModifier) {
         GoalSelector mobGoalSelector = ((LivingGoalAccessor) entity).cartoonishHordeGetMobGoalSelector();
         mobGoalSelector.addGoal(entityHordeData.getGoalPriority(), new HordeMovementGoal<>(entity, this, movementSpeedModifier));
     }
@@ -563,7 +544,7 @@ public class Horde {
     /*
         Usage: Sets horde entity spawning data.
      */
-    public void setHordeData(EntityHordeData... entityHordeData) {
+    public void setHordeData(EntityTypeHordeData... entityHordeData) {
         this.hordeData.clear();
         hordeData.addAll(List.of(entityHordeData));
     }
