@@ -1,7 +1,7 @@
 package com.villain.cartoonishhorde.testcommands;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.villain.cartoonishhorde.EntityTypeHorde;
+import com.villain.cartoonishhorde.hordes.EntityTypeHorde;
 import com.villain.cartoonishhorde.ForgeCartoonishHorde;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;

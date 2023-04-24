@@ -23,7 +23,7 @@ public class CommonCartoonishHorde {
         Goal hordeGoal = null;
         if (prioritizedGoals != null) {
             for (WrappedGoal prioritizedGoal : prioritizedGoals) {
-                if (prioritizedGoal.getGoal() instanceof HordeMovementGoal) {
+                if (prioritizedGoal.getGoal() instanceof TypeHordeMovementGoal) {
                     hordeGoal = prioritizedGoal.getGoal();
                     if (hordeGoal != null) break;
                 }

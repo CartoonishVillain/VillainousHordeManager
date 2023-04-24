@@ -1,5 +1,6 @@
 package com.villain.cartoonishhorde;
 
+import com.villain.cartoonishhorde.hordes.EntityEnumHorde;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
@@ -8,12 +9,12 @@ import net.minecraft.world.phys.Vec3;
 import java.util.EnumSet;
 
 //based on move towards raid goal
-public class HordeMovementGoal<T extends PathfinderMob> extends Goal {
+public class EnumHordeMovementGoal<T extends PathfinderMob> extends Goal {
     private final T Member;
-    private final EntityTypeHorde hordeInstance;
+    private final EntityEnumHorde hordeInstance;
     private final double movementModifier;
 
-    public HordeMovementGoal(T member, EntityTypeHorde hordeInstance, Double movementModifier){
+    public EnumHordeMovementGoal(T member, EntityEnumHorde hordeInstance, Double movementModifier){
         this.Member = member;
         this.hordeInstance = hordeInstance;
         this.movementModifier = movementModifier;

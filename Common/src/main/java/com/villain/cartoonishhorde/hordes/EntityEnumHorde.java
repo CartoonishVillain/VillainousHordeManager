@@ -1,7 +1,11 @@
-package com.villain.cartoonishhorde;
+package com.villain.cartoonishhorde.hordes;
 
 
-import com.villain.cartoonishhorde.hordedata.EntityTypeHordeData;
+import com.villain.cartoonishhorde.Constants;
+import com.villain.cartoonishhorde.EnumHordeMovementGoal;
+import com.villain.cartoonishhorde.TypeHordeMovementGoal;
+import com.villain.cartoonishhorde.RuleEnumInterface;
+import com.villain.cartoonishhorde.hordedata.EnumHordeData;
 import com.villain.cartoonishhorde.mixin.AvailableGoalsAccessor;
 import com.villain.cartoonishhorde.mixin.LivingGoalAccessor;
 import net.minecraft.core.BlockPos;
@@ -25,7 +29,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.*;
 
-public class EntityTypeHorde {
+public abstract class EntityEnumHorde {
     protected ServerLevel world;
     protected BlockPos center;
     protected Boolean hordeActive = false;
@@ -39,8 +43,11 @@ public class EntityTypeHorde {
     protected ArrayList<ServerPlayer> players = new ArrayList<>();
     protected ArrayList<LivingEntity> activeHordeMembers = new ArrayList<>();
     protected final ServerBossEvent bossInfo = new ServerBossEvent(Component.literal("EntityTypeHorde"), BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.PROGRESS);
-    protected ArrayList<EntityTypeHordeData> hordeData = new ArrayList<>();
+    protected ArrayList<EnumHordeData> hordeData = new ArrayList<>();
 
+    /**
+     * The enum of reasons why the Horde may end.
+     */
     public enum HordeStopReasons {
         VICTORY, //Players beat the event
         DEFEAT, //Players are defeated or quit the event.
@@ -48,18 +55,18 @@ public class EntityTypeHorde {
         SPAWN_ERROR  //Players are in a position that causes the spawn manager to panic and shut down the event before it hangs the server.
     }
 
-    /*
-        Usage: Constructor for the EntityTypeHorde system.
-        Parameter Details: a MinecraftServer instance helps the horde system keep track of players who should be involved in the horde process.
+    /**
+     * Constructor for the EntityEnumHorde system
+     * @param server  a MinecraftServer instance helps the horde system keep track of players who should be involved in the horde process.
      */
-    public EntityTypeHorde(MinecraftServer server) {
+    public EntityEnumHorde(MinecraftServer server) {
         this.server = server;
     }
 
-
-    /*
-        Usage: Clears out all data for a given horde and ends it.
-        Additional Notes: You would want to override this to clean up any additional information you're tracking.
+    /**
+     * Clears out all data for a given horde and ends it.
+     * You would want to override this to clean up any additional information you're tracking.
+     * @param stopReason The code for why the error ended.
      */
     public void Stop(HordeStopReasons stopReason) {
         this.bossInfo.setVisible(false);
@@ -89,19 +96,17 @@ public class EntityTypeHorde {
 
     }
 
-    /*
-        Usage: Returns if the given instance of a horde is currently running.
+    /**
+     * @return If the horde instance is currently active.
      */
     public Boolean getHordeActive() {
         return hordeActive;
     }
 
-
-    /*
-        Usage: Initial phase. The EntityTypeHorde targets a specific player as it's anchor point (where horde members approach, and base their spawning off of)
-        Parameter Details: A server player entity for the horde to track.
-        Additional Notes: Now would be a good time to set up additional information to track if needed.
-
+    /**
+     * Initial phase. The EntityEnumHorde targets a specific player as it's anchor point (where horde members approach, and base their spawning off of)
+     * Now would be a good time to set up additional information to track if needed.
+     * @param serverPlayer A server player entity for the horde to track.
      */
     public void SetUpHorde(ServerPlayer serverPlayer) {
         world = serverPlayer.getLevel();
@@ -110,17 +115,12 @@ public class EntityTypeHorde {
             hordeAnchorPlayer = serverPlayer;
             //Set alive counter based on difficulty
             switch (world.getDifficulty()) {
-                case EASY:
-                    setEasyDifficultyStats();
-                    break;
-                case NORMAL:
-                    setNormalDifficultyStats();
-                    break;
-                case HARD:
-                    setHardDifficultyStats();
-                    break;
-                case PEACEFUL:
+                case EASY -> setEasyDifficultyStats();
+                case NORMAL -> setNormalDifficultyStats();
+                case HARD -> setHardDifficultyStats();
+                case PEACEFUL -> {
                     return;
+                }
             }
 
             setActiveMemberCount();
@@ -129,59 +129,59 @@ public class EntityTypeHorde {
         }
     }
 
-    /*
-        Usage: Used in initial setup to set the maximum amount of entities that are allowed to spawn in an event at once.
-        Additional Notes: Recommend you override to set up your own way of setting this up (whether by configs or other means)
+    /**
+     * Used in initial setup to set the maximum amount of entities that are allowed to spawn in an event at once.
+     * Recommend you override to set up your own way of setting this up (whether by configs or other means)
      */
     public void setActiveMemberCount() {
         allowedActive = 15;
     }
 
-    /*
-        Usage: Used in initial setup to set how many entities players need to defeat before the horde ends on Easy.
-        Additional Notes: Recommend you override to set up your own way of setting this up (whether by configs or other means)
+    /**
+     *   Used in initial setup to set how many entities players need to defeat before the horde ends on Easy.
+     *   Recommend you override to set up your own way of setting this up (whether by configs or other means)
      */
     public void setEasyDifficultyStats() {
         Alive = 10;
         initAlive = 10;
     }
 
-    /*
-        Usage: Used in initial setup to set how many entities players need to defeat before the horde ends on Normal.
-        Additional Notes: Recommend you override to set up your own way of setting this up (whether by configs or other means)
-    */
+    /**
+     *   Used in initial setup to set how many entities players need to defeat before the horde ends on Normal.
+     *   Recommend you override to set up your own way of setting this up (whether by configs or other means)
+     */
     public void setNormalDifficultyStats() {
         Alive = 25;
         initAlive = 25;
     }
 
-    /*
-        Usage: Used in initial setup to set how many entities players need to defeat before the horde ends on Hard.
-        Additional Notes: Recommend you override to set up your own way of setting this up (whether by configs or other means)
-    */
+    /**
+     *   Used in initial setup to set how many entities players need to defeat before the horde ends on Hard.
+     *   Recommend you override to set up your own way of setting this up (whether by configs or other means)
+     */
     public void setHardDifficultyStats() {
         Alive = 40;
         initAlive = 40;
     }
 
-    /*
-        Usage: Used to update the center block to control mob spawn positions and where mobs wander towards
-        Parameter Details: A BlockPos to set the center variable to.
+    /**
+     *   Used to update the center block to control mob spawn positions and where mobs wander towards
+     *   @param centerPosition - A BlockPos to set the center variable to.
      */
     public void setCenterBlock(BlockPos centerPosition) {
         this.center = centerPosition;
     }
 
-    /*
-        Usage: Checks if a given player is still properly alive. This is to avoid desync issues.
-        Parameter Details: ServerPlayer to check.
+    /**
+     *   Checks if a given player is still properly alive. This is to avoid desync issues.
+     *   @param serverPlayer - ServerPlayer to check.
      */
     protected boolean checkIfPlayerIsStillValid(ServerPlayer serverPlayer) {
         return serverPlayer.getHealth() != 0.0f && !serverPlayer.isRemoved();
     }
 
-    /*
-        Usage: Checks during tick if peaceful difficulty is set. If it is, the horde is automatically ended.
+    /**
+     *   Checks during tick if peaceful difficulty is set. If it is, the horde is automatically ended.
      */
     protected void PeacefulCheck() {
         if (this.world.getDifficulty() == Difficulty.PEACEFUL) {
@@ -189,9 +189,9 @@ public class EntityTypeHorde {
         }
     }
 
-    /*
-        Usage: Automatically updates the horde center position
-    */
+    /**
+     *   Automatically updates the horde center position
+     */
     protected void updateCenter() {
         if (updateCenter == 0) {
             center = hordeAnchorPlayer.getOnPos();
@@ -203,9 +203,9 @@ public class EntityTypeHorde {
         }
     }
 
-    /*
-        Usage: The tick event. The heart and soul of the horde. Patch your version of the tick event into the world tick to allow the horde to function when activated!
-        Additional Notes: For additional or generally different functionality you can override this
+    /**
+     *   The tick event. The heart and soul of the horde. Patch your version of the tick event into the world tick to allow the horde to function when activated!
+     *   For additional or generally different functionality you can override this
      */
     //TODO: Convert each section of the tick to it's own method for more user modularity.
     public void tick() {
@@ -227,7 +227,7 @@ public class EntityTypeHorde {
 
                     //If we have room to spawn more horde members, spawn more
                     if (Active < allowedActive) {
-                        spawnHordeMember();
+                        selectHordeMember();
                     }
 
                     updateCenter();
@@ -252,6 +252,10 @@ public class EntityTypeHorde {
         }
     }
 
+    /**
+     * Checks if new players have entered in range of the event and adds them into the tracking.
+     * Checks if players are no longer in range of the event and removes them from the tracking.
+     */
     protected void updatePlayers() {
         for (ServerPlayer serverPlayer : server.getPlayerList().getPlayers()) {
             if (this.hordeAnchorPlayer == serverPlayer) {
@@ -279,8 +283,8 @@ public class EntityTypeHorde {
         }
     }
 
-    /*
-        Usage: Takes stock of the status of horde members. Removes missing and dead members and updates tallies accordingly.
+    /**
+     *   Takes stock of the status of horde members. Removes missing and dead members and updates tallies accordingly.
      */
     protected void updateHorde() {
         ArrayList<LivingEntity> removals = new ArrayList<>();
@@ -309,9 +313,8 @@ public class EntityTypeHorde {
         removals.clear();
     }
 
-
-    /*
-        Usage: Begins the search for a valid spawnpoint for horde members.
+    /**
+     *   Begins the search for a valid spawnpoint for horde members.
      */
     protected Optional<BlockPos> getValidSpawn(int var, EntityType type) {
         for (int i = 0; i < 3; ++i) {
@@ -321,8 +324,8 @@ public class EntityTypeHorde {
         return Optional.empty();
     }
 
-    /*
-        Usage: Finds the random spawn position for horde members
+    /**
+     *   Finds the random spawn position for horde members
      */
     protected BlockPos findRandomSpawnPos(int loopvar, EntityType type) {
         BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
@@ -336,7 +339,6 @@ public class EntityTypeHorde {
                 DISTANCE = center.distSqr(new BlockPos(j, center.getY(), l));
             }
 
-//            int k = this.world.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, j, l);
             int k = findSafeYPosition(j, l, type, false);
             if (k != world.getMinBuildHeight() - 1) {
                 blockPos.set(j, k, l);
@@ -353,7 +355,6 @@ public class EntityTypeHorde {
             DISTANCE = center.distSqr(new BlockPos(j, center.getY(), l));
         }
 
-//            int k = this.world.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, j, l);
         int k = findSafeYPosition(j, l, type, true);
         if (k != world.getMinBuildHeight() - 1) {
             blockPos.set(j, k, l);
@@ -363,8 +364,8 @@ public class EntityTypeHorde {
     }
 
 
-    /*
-        Usage: Finds the y spawnpoint for horde members.
+    /**
+     *   Usage: Finds the y spawnpoint for horde members.
      */
     protected int findSafeYPosition(int xValue, int zValue, EntityType entityType, boolean unfiltered) {
         int height = Mth.ceil(entityType.getDimensions().height);
@@ -427,38 +428,50 @@ public class EntityTypeHorde {
         return world.getMinBuildHeight() - 1;
     }
 
+    /**
+     * Randomizes a coordinate based on the center coordinate
+     * @param centercoord the center tracking coordinate of the horde
+     * @return the randomized coordinate.
+     */
     protected int randFinder(int centercoord) {
         return centercoord + (this.world.random.nextInt(25 + 25) - 25);
     }
 
-    //when a horde member spawns
+    /**
+     * Tallies the active spawn cap after spawning an entity in the horde.
+     */
     public void SpawnUnit() {
         Active++;
     }
 
-    //when a horde member is invited after spawning from other means.
+    /**
+     * Tallies the active spawn cap after dragging a unit pre-existing into the horde.
+     */
     public void InviteUnit() {
         Active++;
     }
 
-    //when a horde member dies
+    /**
+     * Tallies the active and total alive entities down because the unit was killed
+     */
     public void UnitDown() {
         Active--;
         Alive--;
     }
 
-    //when a horde member loses range.
+    /**
+     * Tallies the active spawn cap down as a unit fell out of range.
+     */
     public void UnitLost() {
         Active--;
     }
 
-    /*
-        Usage: Spawns horde entities.
+    /**
+     *   Selects an enum for you to spawn mobs for. Used for custom rules spawning.
      */
-    protected void spawnHordeMember() {
-        Optional<BlockPos> hordeSpawn = Optional.empty();
+    protected void selectHordeMember() {
         ArrayList<Integer> SpawnWeights = new ArrayList<>();
-        for (EntityTypeHordeData hordeEntry : hordeData) {
+        for (EnumHordeData hordeEntry : hordeData) {
             SpawnWeights.add(hordeEntry.getSpawnWeight());
         }
         int combined = 0;
@@ -475,54 +488,42 @@ public class EntityTypeHorde {
             rng -= weights;
         }
 
-        EntityTypeHordeData entrySelected = hordeData.get(selected);
-        PathfinderMob pathfinderMob = entrySelected.createInstance(world);
-
-        int attempts = 0;
-        while (hordeSpawn.isEmpty()) {
-            hordeSpawn = this.getValidSpawn(2, entrySelected.getType());
-            attempts++;
-            if (hordeSpawn.isEmpty() && attempts >= 5) {
-                this.Stop(HordeStopReasons.SPAWN_ERROR);
-                return;
-            }
-        }
-
-
-        if (pathfinderMob != null) {
-            pathfinderMob.setPos(hordeSpawn.get().getX(), hordeSpawn.get().getY(), hordeSpawn.get().getZ());
-            injectGoal(pathfinderMob, entrySelected, entrySelected.getGoalMovementSpeed());
-            world.addFreshEntity(pathfinderMob);
-            SpawnUnit();
-            activeHordeMembers.add(pathfinderMob);
-        }
-
+        RuleEnumInterface enumSelected = hordeData.get(selected).getType();
+        spawnBasedOnEnum(enumSelected, hordeData.get(selected));
     }
 
-    /*
-        Usage: Returns the center of the EntityTypeHorde.
+    /**
+     * Usage - This is the method you'll use to spawn your entity based on the enum provided in selectHordeMember
+     * the enum, of course, should extend RuleEnumInterface.
+     * @param enumSelected - The enum chosen.
+     * @param entrySelected - The data associated with the chosen mob.
+     */
+    protected abstract void spawnBasedOnEnum(RuleEnumInterface enumSelected, EnumHordeData entrySelected);
+
+    /**
+     *   Returns the center of the EntityTypeHorde.
      */
     public BlockPos getCenter() {
         return center;
     }
 
-    /*
-        Usage: Checks if a given entity is in the roster of monsters/
+    /**
+     *   Checks if a given entity is in the roster of monsters/
      */
     public boolean isHordeMember(LivingEntity entity) {
         return activeHordeMembers.contains(entity);
     }
 
-    /*
-        Usage: Injects the horde movement and swarming goal into the entity.
+    /**
+     *   Injects the horde movement and swarming goal into the entity.
      */
-    public void injectGoal(PathfinderMob entity, EntityTypeHordeData entityHordeData, double movementSpeedModifier) {
+    public void injectGoal(PathfinderMob entity, EnumHordeData entityHordeData, double movementSpeedModifier) {
         GoalSelector mobGoalSelector = ((LivingGoalAccessor) entity).cartoonishHordeGetMobGoalSelector();
-        mobGoalSelector.addGoal(entityHordeData.getGoalPriority(), new HordeMovementGoal<>(entity, this, movementSpeedModifier));
+        mobGoalSelector.addGoal(entityHordeData.getGoalPriority(), new EnumHordeMovementGoal<>(entity, this, movementSpeedModifier));
     }
 
-    /*
-        Usage: removes the horde movement and swarming goal from the entity.
+    /**
+        Removes the horde movement and swarming goal from the entity.
      */
     public static void removeGoal(PathfinderMob entity) {
         GoalSelector mobGoalSelector = ((LivingGoalAccessor) entity).cartoonishHordeGetMobGoalSelector();
@@ -530,7 +531,7 @@ public class EntityTypeHorde {
         Goal toremove = null;
         if (prioritizedGoals != null) {
             for (WrappedGoal prioritizedGoal : prioritizedGoals) {
-                if (prioritizedGoal.getGoal() instanceof HordeMovementGoal) {
+                if (prioritizedGoal.getGoal() instanceof TypeHordeMovementGoal) {
                     toremove = prioritizedGoal.getGoal();
                     if (toremove != null) break;
                 }
@@ -541,12 +542,11 @@ public class EntityTypeHorde {
         }
     }
 
-    /*
-        Usage: Sets horde entity spawning data.
+    /**
+        Sets horde entity spawning data.
      */
-    public void setHordeData(EntityTypeHordeData... entityHordeData) {
+    public void setHordeData(EnumHordeData... entityHordeData) {
         this.hordeData.clear();
         hordeData.addAll(List.of(entityHordeData));
     }
-
 }
