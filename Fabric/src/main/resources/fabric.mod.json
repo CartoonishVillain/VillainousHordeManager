@@ -1,6 +1,6 @@
 {
     "schemaVersion": 1,
-    "id": "cartoonishhorde",
+    "id": "villainoushordemanager",
     "version": "${version}",
   
     "name": "Villainous Horde Library",
@@ -17,12 +17,12 @@
     "environment": "*",
     "entrypoints": {
       "main": [
-        "com.villain.cartoonishhorde.FabricCartoonishHorde"
+        "com.villain.villainoushordemanager.FabricVillainousHordeManager"
       ]
     },
     "mixins": [
-      "cartoonishhorde.mixins.json",
-      "cartoonishhorde.fabric.mixins.json"
+      "villainoushordemanager.mixins.json",
+      "villainoushordemanager.fabric.mixins.json"
     ],
   
     "depends": {
