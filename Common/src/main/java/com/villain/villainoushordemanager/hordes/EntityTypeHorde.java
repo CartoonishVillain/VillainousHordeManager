@@ -109,28 +109,30 @@ public class EntityTypeHorde {
      * @param serverPlayer A server player entity for the horde to track.
      */
     public void SetUpHorde(ServerPlayer serverPlayer) {
-        world = serverPlayer.getLevel();
+        if (serverPlayer.level() instanceof ServerLevel) {
+            world = (ServerLevel) serverPlayer.level();
 
-        if (serverPlayer.level.dimension().equals(world.dimension())) {
-            hordeAnchorPlayer = serverPlayer;
-            //Set alive counter based on difficulty
-            switch (world.getDifficulty()) {
-                case EASY:
-                    setEasyDifficultyStats();
-                    break;
-                case NORMAL:
-                    setNormalDifficultyStats();
-                    break;
-                case HARD:
-                    setHardDifficultyStats();
-                    break;
-                case PEACEFUL:
-                    return;
+            if (serverPlayer.level().dimension().equals(world.dimension())) {
+                hordeAnchorPlayer = serverPlayer;
+                //Set alive counter based on difficulty
+                switch (world.getDifficulty()) {
+                    case EASY:
+                        setEasyDifficultyStats();
+                        break;
+                    case NORMAL:
+                        setNormalDifficultyStats();
+                        break;
+                    case HARD:
+                        setHardDifficultyStats();
+                        break;
+                    case PEACEFUL:
+                        return;
+                }
+
+                setActiveMemberCount();
+                setCenterBlock(serverPlayer.blockPosition());
+                hordeActive = true;
             }
-
-            setActiveMemberCount();
-            setCenterBlock(serverPlayer.blockPosition());
-            hordeActive = true;
         }
     }
 
@@ -216,7 +218,7 @@ public class EntityTypeHorde {
     public void tick() {
         if (hordeActive) {
             if (Alive > 0) {
-                if (hordeAnchorPlayer.level.dimensionType().equals(world.dimensionType()) && checkIfPlayerIsStillValid(hordeAnchorPlayer)) {
+                if (hordeAnchorPlayer.level().dimensionType().equals(world.dimensionType()) && checkIfPlayerIsStillValid(hordeAnchorPlayer)) {
                     boolean flag = this.hordeActive;
 
                     PeacefulCheck();
@@ -268,7 +270,7 @@ public class EntityTypeHorde {
                 continue;
             }
             //player is not the tracked player and is in the same world as the tracked world.
-            if (serverPlayer.level.dimensionType().equals(world.dimensionType()) && checkIfPlayerIsStillValid(serverPlayer)) {
+            if (serverPlayer.level().dimensionType().equals(world.dimensionType()) && checkIfPlayerIsStillValid(serverPlayer)) {
                 double distance = Mth.sqrt((float) serverPlayer.distanceToSqr(center.getX(), center.getY(), center.getZ()));
                 if (distance < 64) {
                     if (!players.contains(serverPlayer)) {

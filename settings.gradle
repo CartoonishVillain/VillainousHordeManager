@@ -12,5 +12,5 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'MultiLoader'
+rootProject.name = 'VillainousHordeManager'
 include("Common", "Fabric", "Forge")
