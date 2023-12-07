@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
@@ -40,6 +41,7 @@ public abstract class EntityEnumHorde {
     protected ArrayList<LivingEntity> activeHordeMembers = new ArrayList<>();
     protected final ServerBossEvent bossInfo = new ServerBossEvent(Component.literal("EntityEnumHorde"), BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.PROGRESS);
     protected ArrayList<EnumHordeData<?>> hordeData = new ArrayList<>();
+    protected Boolean despawnLeftBehindMembers = true;
 
     /**
      * The enum of reasons why the Horde may end.
@@ -198,13 +200,10 @@ public abstract class EntityEnumHorde {
      *   The tick event. The heart and soul of the horde. Patch your version of the tick event into the world tick to allow the horde to function when activated!
      *   For additional or generally different functionality you can override this
      */
-    //TODO: Convert each section of the tick to it's own method for more user modularity.
     public void tick() {
         if (hordeActive) {
             if (Alive > 0) {
                 if (hordeAnchorPlayer.level().dimensionType().equals(world.dimensionType()) && checkIfPlayerIsStillValid(hordeAnchorPlayer)) {
-                    boolean flag = this.hordeActive;
-
                     PeacefulCheck();
                     if(!hordeActive) return;
 
@@ -279,7 +278,7 @@ public abstract class EntityEnumHorde {
      */
     protected void updateHorde() {
         ArrayList<LivingEntity> removals = new ArrayList<>();
-        ArrayList<LivingEntity> additions = new ArrayList<>();
+        ArrayList<LivingEntity> deleteMobs = new ArrayList<>();
         for (LivingEntity hordeMember : activeHordeMembers) {
 
             if (hordeMember.isDeadOrDying()) {
@@ -294,13 +293,19 @@ public abstract class EntityEnumHorde {
             if (Mth.sqrt((float) hordeMember.distanceToSqr(hordeTarget.getX(), hordeTarget.getY(), hordeTarget.getZ())) > 64) {
                 removeGoal((PathfinderMob) hordeMember);
                 removals.add(hordeMember);
+                if (despawnLeftBehindMembers) deleteMobs.add(hordeMember);
                 UnitLost();
             }
         }
+
         for (LivingEntity removal : removals) {
             activeHordeMembers.remove(removal);
         }
-        activeHordeMembers.addAll(additions);
+
+        for (LivingEntity removal : deleteMobs) {
+            removal.remove(Entity.RemovalReason.DISCARDED);
+        }
+
         removals.clear();
     }
 
