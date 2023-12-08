@@ -220,11 +220,12 @@ public abstract class EntityEnumHorde {
                         selectHordeMember();
                     }
 
-                    updateCenter();
+                    if (hordeActive) {
+                        updateCenter();
 
-                    float aliveDivision = ((float) Alive / initAlive);
-                    this.bossInfo.setProgress(Mth.clamp(aliveDivision, 0.0f, 1f));
-
+                        float aliveDivision = ((float) Alive / initAlive);
+                        this.bossInfo.setProgress(Mth.clamp(aliveDivision, 0.0f, 1f));
+                    }
                 } else {
                     //look for viable player, or cancel.
                     updatePlayers();
