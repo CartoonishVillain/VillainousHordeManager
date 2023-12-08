@@ -47,7 +47,7 @@ public class ForgeTestEnumHorde extends EntityEnumHorde {
         if (mobToSpawn != null) {
             int attempts = 0;
             while (hordeSpawn.isEmpty()) {
-                hordeSpawn = this.getValidSpawn(2, mobToSpawn.getType());
+                hordeSpawn = this.getValidSpawn(10, mobToSpawn.getType());
                 attempts++;
                 if (hordeSpawn.isEmpty() && attempts >= 5) {
                     this.Stop(EntityEnumHorde.HordeStopReasons.SPAWN_ERROR);

@@ -1,9 +1,9 @@
 package com.cartoonishvillain.villainoushordelibrary.hordes;
 
-import com.cartoonishvillain.villainoushordelibrary.EnumHordeMovementGoal;
-import com.cartoonishvillain.villainoushordelibrary.RuleEnumInterface;
+import com.cartoonishvillain.villainoushordelibrary.JsonHordeMovementGoal;
+import com.cartoonishvillain.villainoushordelibrary.TypeHordeMovementGoal;
 import com.cartoonishvillain.villainoushordelibrary.VillainousHordeLibrary;
-import com.cartoonishvillain.villainoushordelibrary.hordedata.EnumHordeData;
+import com.cartoonishvillain.villainoushordelibrary.hordedata.EntityTypeHordeData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.*;
 
-public abstract class EntityEnumHorde {
+public class JsonHorde {
     protected ServerLevel world;
     protected BlockPos center;
     protected Boolean hordeActive = false;
@@ -34,14 +34,18 @@ public abstract class EntityEnumHorde {
     protected int Alive = 0;
     protected int initAlive = 0;
     protected int Active = 0;
-    protected int allowedActive = 0;
+    protected int allowedActive;
     protected int updateCenter = 0;
     protected ServerPlayer hordeAnchorPlayer;
     protected ArrayList<ServerPlayer> players = new ArrayList<>();
     protected ArrayList<LivingEntity> activeHordeMembers = new ArrayList<>();
-    protected final ServerBossEvent bossInfo = new ServerBossEvent(Component.literal("EntityEnumHorde"), BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.PROGRESS);
-    protected ArrayList<EnumHordeData<?>> hordeData = new ArrayList<>();
+    protected final ServerBossEvent bossInfo;
+    protected ArrayList<EntityTypeHordeData> hordeData;
+    protected String hordeName;
     protected Boolean despawnLeftBehindMembers = true;
+    protected int easyKillCount;
+    protected int normalKillCount;
+    protected int hardKillCount;
 
     /**
      * The enum of reasons why the Horde may end.
@@ -49,17 +53,45 @@ public abstract class EntityEnumHorde {
     public enum HordeStopReasons {
         VICTORY, //Players beat the event
         DEFEAT, //Players are defeated or quit the event.
-        PEACEFUL, //Server changed to peaceful mid horde, event canceled.
+        PEACEFUL, //Server changed to peaceful mid-horde, event canceled.
         SPAWN_ERROR  //Players are in a position that causes the spawn manager to panic and shut down the event before it hangs the server.
     }
 
     /**
-     * Constructor for the EntityEnumHorde system
+     * Constructor for the EntityTypeHorde system
      * @param server  a MinecraftServer instance helps the horde system keep track of players who should be involved in the horde process.
      */
-    public EntityEnumHorde(MinecraftServer server) {
+    public JsonHorde(
+            MinecraftServer server,
+            int easyKills,
+            int normalKills,
+            int hardKills,
+            int aliveLimit,
+            String bossText,
+            String color,
+            String hordeName,
+            ArrayList<EntityTypeHordeData> hordeData
+    ) {
         this.server = server;
+        easyKillCount = easyKills;
+        normalKillCount = normalKills;
+        hardKillCount = hardKills;
+        allowedActive = aliveLimit;
+        this.hordeName = hordeName;
+        this.hordeData = hordeData;
+        BossEvent.BossBarColor bossColor = switch (color.toLowerCase()) {
+            case "green" -> BossEvent.BossBarColor.GREEN;
+            case "blue" -> BossEvent.BossBarColor.BLUE;
+            case "pink" -> BossEvent.BossBarColor.PINK;
+            case "red" -> BossEvent.BossBarColor.RED;
+            case "purple" -> BossEvent.BossBarColor.PURPLE;
+            case "yellow" -> BossEvent.BossBarColor.YELLOW;
+            default -> BossEvent.BossBarColor.WHITE;
+        };
+
+        bossInfo = new ServerBossEvent(Component.literal(bossText), bossColor, BossEvent.BossBarOverlay.PROGRESS);
     }
+
 
     /**
      * Clears out all data for a given horde and ends it.
@@ -79,10 +111,17 @@ public abstract class EntityEnumHorde {
         players.clear();
 
         switch (stopReason) {
-            case VICTORY -> VillainousHordeLibrary.LOGGER.info("Player Victory against EntityEnumHorde");
-            case DEFEAT -> VillainousHordeLibrary.LOGGER.info("Player Defeat against EntityEnumHorde");
-            case SPAWN_ERROR -> VillainousHordeLibrary.LOGGER.error("EntityEnumHorde canceled! Could not locate spawn placement! (Entities are too big, or terrain is too noisy)");
-            case PEACEFUL -> VillainousHordeLibrary.LOGGER.info("EntityEnumHorde canceled, server changed to peaceful!");
+            case VICTORY -> {
+                VillainousHordeLibrary.LOGGER.info("Player Victory against " + hordeName);
+            }
+            case DEFEAT -> {
+                VillainousHordeLibrary.LOGGER.info("Player Defeat against" + hordeName);
+            } case SPAWN_ERROR ->  {
+                VillainousHordeLibrary.LOGGER.error(hordeName + " canceled! Could not locate spawn placement! (Entities are too big, or terrain is too noisy)");
+            }
+            case PEACEFUL -> {
+                VillainousHordeLibrary.LOGGER.info(hordeName + " canceled, server changed to peaceful!");
+            }
         }
 
     }
@@ -94,8 +133,9 @@ public abstract class EntityEnumHorde {
         return hordeActive;
     }
 
+
     /**
-     * Initial phase. The EntityEnumHorde targets a specific player as it's anchor point (where horde members approach, and base their spawning off of)
+     * Initial phase. The EntityTypeHorde targets a specific player as it's anchor point (where horde members approach, and base their spawning off of)
      * Now would be a good time to set up additional information to track if needed.
      * @param serverPlayer A server player entity for the horde to track.
      */
@@ -127,7 +167,7 @@ public abstract class EntityEnumHorde {
      * Recommend you override to set up your own way of setting this up (whether by configs or other means)
      */
     public void setActiveMemberCount() {
-        allowedActive = 15;
+
     }
 
     /**
@@ -217,7 +257,7 @@ public abstract class EntityEnumHorde {
 
                     //If we have room to spawn more horde members, spawn more
                     if (Active < allowedActive) {
-                        selectHordeMember();
+                        spawnHordeMember();
                     }
 
                     updateCenter();
@@ -309,12 +349,13 @@ public abstract class EntityEnumHorde {
         removals.clear();
     }
 
+
     /**
      *   Begins the search for a valid spawnpoint for horde members.
      */
     protected Optional<BlockPos> getValidSpawn(int var, EntityType type) {
         for (int i = 0; i < 3; ++i) {
-            BlockPos blockPos = this.findRandomSpawnPos(var, type);
+            BlockPos blockPos = this.findRandomSpawnPos(5, type);
             if (blockPos != null) return Optional.of(blockPos);
         }
         return Optional.empty();
@@ -463,11 +504,12 @@ public abstract class EntityEnumHorde {
     }
 
     /**
-     *   Selects an enum for you to spawn mobs for. Used for custom rules spawning.
+     *   Spawns horde entities.
      */
-    protected void selectHordeMember() {
+    protected void spawnHordeMember() {
+        Optional<BlockPos> hordeSpawn = Optional.empty();
         ArrayList<Integer> SpawnWeights = new ArrayList<>();
-        for (EnumHordeData hordeEntry : hordeData) {
+        for (EntityTypeHordeData hordeEntry : hordeData) {
             SpawnWeights.add(hordeEntry.getSpawnWeight());
         }
         int combined = 0;
@@ -484,20 +526,32 @@ public abstract class EntityEnumHorde {
             rng -= weights;
         }
 
-        RuleEnumInterface enumSelected = hordeData.get(selected).getType();
-        spawnBasedOnEnum(enumSelected, hordeData.get(selected));
+        EntityTypeHordeData entrySelected = hordeData.get(selected);
+        PathfinderMob pathfinderMob = entrySelected.createInstance(world);
+
+        int attempts = 0;
+        while (hordeSpawn.isEmpty()) {
+            hordeSpawn = this.getValidSpawn(2, entrySelected.getType());
+            attempts++;
+            if (hordeSpawn.isEmpty() && attempts >= 5) {
+                this.Stop(HordeStopReasons.SPAWN_ERROR);
+                return;
+            }
+        }
+
+
+        if (pathfinderMob != null) {
+            pathfinderMob.setPos(hordeSpawn.get().getX(), hordeSpawn.get().getY(), hordeSpawn.get().getZ());
+            injectGoal(pathfinderMob, entrySelected, entrySelected.getGoalMovementSpeed());
+            world.addFreshEntity(pathfinderMob);
+            SpawnUnit();
+            activeHordeMembers.add(pathfinderMob);
+        }
+
     }
 
     /**
-     * Usage - This is the method you'll use to spawn your entity based on the enum provided in selectHordeMember
-     * the enum, of course, should extend RuleEnumInterface.
-     * @param enumSelected - The enum chosen.
-     * @param entrySelected - The data associated with the chosen mob.
-     */
-    protected abstract void spawnBasedOnEnum(RuleEnumInterface enumSelected, EnumHordeData entrySelected);
-
-    /**
-     *   Returns the center of the EntityEnumHorde.
+     *   Returns the center of the EntityTypeHorde.
      */
     public BlockPos getCenter() {
         return center;
@@ -513,20 +567,20 @@ public abstract class EntityEnumHorde {
     /**
      *   Injects the horde movement and swarming goal into the entity.
      */
-    public void injectGoal(PathfinderMob entity, EnumHordeData entityHordeData, double movementSpeedModifier) {
+    public void injectGoal(PathfinderMob entity, EntityTypeHordeData entityHordeData, double movementSpeedModifier) {
         GoalSelector mobGoalSelector = entity.goalSelector;
-        mobGoalSelector.addGoal(entityHordeData.getGoalPriority(), new EnumHordeMovementGoal<>(entity, this, movementSpeedModifier));
+        mobGoalSelector.addGoal(entityHordeData.getGoalPriority(), new JsonHordeMovementGoal<>(entity, this, movementSpeedModifier));
     }
 
     /**
-        Removes the horde movement and swarming goal from the entity.
+     Removes the horde movement and swarming goal from the entity.
      */
     public static void removeGoal(PathfinderMob entity) {
         GoalSelector mobGoalSelector = entity.goalSelector;
         Set<WrappedGoal> prioritizedGoals = mobGoalSelector.getAvailableGoals();
         Goal toremove = null;
         for (WrappedGoal prioritizedGoal : prioritizedGoals) {
-            if (prioritizedGoal.getGoal() instanceof EnumHordeMovementGoal) {
+            if (prioritizedGoal.getGoal() instanceof TypeHordeMovementGoal) {
                 toremove = prioritizedGoal.getGoal();
                 break;
             }
@@ -539,8 +593,9 @@ public abstract class EntityEnumHorde {
     /**
         Sets horde entity spawning data.
      */
-    public void setHordeData(EnumHordeData<?>... entityHordeData) {
+    public void setHordeData(EntityTypeHordeData... entityHordeData) {
         this.hordeData.clear();
         hordeData.addAll(List.of(entityHordeData));
     }
+
 }

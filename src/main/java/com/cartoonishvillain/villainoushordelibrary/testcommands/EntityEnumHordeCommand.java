@@ -11,13 +11,13 @@ import java.util.Objects;
 public class EntityEnumHordeCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register(Commands.literal("hordeManager").then(Commands.literal("startEnumHorde")
+        dispatcher.register(Commands.literal("hordeLibrary").then(Commands.literal("startEnumHorde")
                 .requires(cs -> cs.hasPermission(2))
                 .executes(context -> startHorde(context.getSource()))
 
         ));
 
-        dispatcher.register(Commands.literal("hordeManager").then(Commands.literal("stopEnumHorde")
+        dispatcher.register(Commands.literal("hordeLibrary").then(Commands.literal("stopEnumHorde")
                 .requires(cs -> cs.hasPermission(2))
                 .executes(context -> stopHorde(context.getSource()))
 

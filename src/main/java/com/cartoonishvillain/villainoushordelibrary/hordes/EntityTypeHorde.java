@@ -328,7 +328,7 @@ public class EntityTypeHorde {
      */
     protected Optional<BlockPos> getValidSpawn(int var, EntityType type) {
         for (int i = 0; i < 3; ++i) {
-            BlockPos blockPos = this.findRandomSpawnPos(5, type);
+            BlockPos blockPos = this.findRandomSpawnPos(var, type);
             if (blockPos != null) return Optional.of(blockPos);
         }
         return Optional.empty();
@@ -504,7 +504,7 @@ public class EntityTypeHorde {
 
         int attempts = 0;
         while (hordeSpawn.isEmpty()) {
-            hordeSpawn = this.getValidSpawn(2, entrySelected.getType());
+            hordeSpawn = this.getValidSpawn(10, entrySelected.getType());
             attempts++;
             if (hordeSpawn.isEmpty() && attempts >= 5) {
                 this.Stop(HordeStopReasons.SPAWN_ERROR);

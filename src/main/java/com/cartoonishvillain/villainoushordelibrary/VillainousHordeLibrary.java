@@ -2,11 +2,16 @@ package com.cartoonishvillain.villainoushordelibrary;
 
 import com.cartoonishvillain.villainoushordelibrary.codebasedhordetest.ForgeTestEnumHorde;
 import com.cartoonishvillain.villainoushordelibrary.codebasedhordetest.ForgeTestHordeDataClass;
+import com.cartoonishvillain.villainoushordelibrary.data.JsonHordes;
 import com.cartoonishvillain.villainoushordelibrary.hordedata.EntityTypeHordeData;
 import com.cartoonishvillain.villainoushordelibrary.hordedata.EnumHordeData;
 import com.cartoonishvillain.villainoushordelibrary.hordes.EntityTypeHorde;
+import com.cartoonishvillain.villainoushordelibrary.hordes.JsonHorde;
 import com.cartoonishvillain.villainoushordelibrary.testcommands.EntityEnumHordeCommand;
+import com.cartoonishvillain.villainoushordelibrary.testcommands.EntityJsonHordeCommand;
 import com.cartoonishvillain.villainoushordelibrary.testcommands.EntityTypeHordeCommand;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import com.mojang.logging.LogUtils;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
@@ -25,13 +30,26 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.TickEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.slf4j.Logger;
+import com.cartoonishvillain.villainoushordelibrary.data.JsonMobData;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Set;
+/*
+ TODO: Steps until 0.5
+
+ TODO: Clean up as many warnings as possible.
+ */
 @Mod(VillainousHordeLibrary.MODID)
 public class VillainousHordeLibrary
 {
     public static EntityTypeHorde entityTypeHorde;
     public static ForgeTestEnumHorde forgeTestEnumHorde;
+    public static HashMap<String, JsonHordes> gsonHordes = new HashMap<>();
+
+    public static JsonHorde jsonHorde;
 
     // Define mod id in a common place for everything to reference
     public static final String MODID = "villainoushordelibrary";
@@ -51,15 +69,16 @@ public class VillainousHordeLibrary
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event)
     {
+        //TODO EntityType.byString()
         if (!FMLLoader.isProduction()) {
             //Step 1 - Instantiate
             entityTypeHorde = new EntityTypeHorde(event.getServer());
             forgeTestEnumHorde = new ForgeTestEnumHorde(event.getServer());
             //This horde will consist of spiders, evokers, and creepers. Roughly equal quantities, but this is psuedo-randomized, so results may vary.
             entityTypeHorde.setHordeData(
-                    new EntityTypeHordeData<>(2, 1, 1, EntityType.SPIDER, Spider.class),
-                    new EntityTypeHordeData<>(2, 1, 1, EntityType.EVOKER, Evoker.class),
-                    new EntityTypeHordeData<>(2, 1, 1, EntityType.CREEPER, Creeper.class)
+                    new EntityTypeHordeData<>(2, 1, 1, EntityType.SPIDER),
+                    new EntityTypeHordeData<>(2, 1, 1, EntityType.EVOKER),
+                    new EntityTypeHordeData<>(2, 1, 1, EntityType.CREEPER)
             );
             //This enum horde will consist of creepers, spiders, and vindicators in the overworld, and zombies, evokers, and skeletons in the nether.
             forgeTestEnumHorde.setHordeData(
@@ -68,6 +87,18 @@ public class VillainousHordeLibrary
                     new EnumHordeData<>(2, 1, 1, ForgeTestHordeDataClass.VINDICATOROVERSKELETONNETHER)
             );
         }
+
+        try {
+            JsonReader reader = new JsonReader(new FileReader("hordeJsonData.json"));
+            JsonHordes[] hordesArray = new Gson().fromJson(reader, JsonHordes[].class);
+            ArrayList<JsonHordes> hordesArrayList = new ArrayList<>(Arrays.stream(hordesArray).toList());
+            for (JsonHordes hordes : hordesArrayList) {
+                gsonHordes.put(hordes.getHordeName(), hordes);
+            }
+        } catch (FileNotFoundException e) {
+            LOGGER.warn("VillainousHordeLibrary - hordeJsonData.json not found! No Json hordes are loaded!");
+        }
+
     }
 
     @SubscribeEvent
@@ -79,6 +110,10 @@ public class VillainousHordeLibrary
                 forgeTestEnumHorde.tick();
             }
         }
+
+        if (!event.level.isClientSide && jsonHorde != null) {
+            jsonHorde.tick();
+        }
     }
 
     @SubscribeEvent
@@ -87,6 +122,7 @@ public class VillainousHordeLibrary
             EntityTypeHordeCommand.register(event.getDispatcher());
             EntityEnumHordeCommand.register(event.getDispatcher());
         }
+        EntityJsonHordeCommand.register(event.getDispatcher());
     }
 
     public static boolean isHordeMember(PathfinderMob entity) {
