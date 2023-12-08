@@ -1,28 +1,25 @@
 
-Installation information
-=======
+# Villainous Horde Manager
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions at [github](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+The villainous horde manager (or villainous horde library) is a mod designed to help control horde events.
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+There are two ways you can make your own horde events.
+* If you have a mod, and would like to directly integrate into the code base for greater control over the horde systems, you can extend the horde classes and follow the examples in the VillainousHordeLibrary file.
+* If you want a quick horde setup, you can follow the example set by hordeJsonData.json. Once the json is complete, you only need to place the file in the version directory (outside of the mods folder).
+  * When you do this, you can start your horde with /hordeLibrary startJsonHorde <hordeName>, if you have cheats enabled or operator level 2 permissions.
+ 
+### Information points for hordes (most relevant to JSON hordes, but information can be helpful to all):
+* hordeName: The name that may appear in the logs for your horde, and the name you use to start the horde.
+* maximumActiveHordeMembers: The mob spawncap at a given moment for the horde.
+* killsRequiredForEasy(/Normal/Hard): The amount of kills required, per difficulty, to triumph over the horde event.
+* bossInfoText: What is the label of the boss bar for the horde event?
+* bossInfoColor: What color is the boss bar?
+  * Only supports: green, blue, pink, red, purple, and yellow. Any other value will be white.
+* despawnLeftBehindMembers: An optimization toggle. If a user runs away from the horde members, and they end up out of range, do we despawn them?
 
-> **Note**: For IDEs other than Intellij IDEA, you must run the `ideBeforeRun` task first from the terminal (such as `./gradlew ideBeforeRun`) for the run configs to work.
+### Information for horde members and horde member data entry (also most relevant for JSON hordes, but information can be helpful to all):
+* mobID: the ID of a given mob, such as minecraft:creeper for creepers.
+* spawnWeight: the likelyhood this mob spawns in a horde, when compared to all other spawn weights in the horde.
+* goalPriority: the priority level the "move towards the center player" goal of the horde is in. This may take some tweaking to get right, but for vanilla mobs 2 is *usually* a safe bet.
+* goalMovementSpeed: the speed of which mobs try to get to the horde center player. 1 is usually recommended, but tinker with it to your heart's content.
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
-
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license, if you do not agree with it you can change your mapping names to other crowdsourced names in your 
-build.gradle. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
-
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
