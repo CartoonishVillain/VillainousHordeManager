@@ -1,0 +1,50 @@
+[
+  {
+    "hordeName": "testHorde",
+    "maximumActiveHordeMembers": 5,
+    "killsRequiredForEasy": 10,
+    "killsRequiredForNormal": 20,
+    "killsRequiredForHard": 30,
+    "bossInfoText": "Hello from JSON!",
+    "bossInfoColor": "red",
+    "despawnLeftBehindMembers": true,
+    "mobData": [
+      {
+        "mobID": "minecraft:creeper",
+        "spawnWeight": 1,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      },
+      {
+        "mobID": "minecraft:spider",
+        "spawnWeight": 1,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      }
+    ]
+  },
+  {
+    "hordeName": "secondTestHorde",
+    "maximumActiveHordeMembers": 5,
+    "killsRequiredForEasy": 10,
+    "killsRequiredForNormal": 20,
+    "killsRequiredForHard": 30,
+    "bossInfoText": "Hello from JSON again!",
+    "bossInfoColor": "blue",
+    "despawnLeftBehindMembers": true,
+    "mobData": [
+      {
+        "mobID": "minecraft:evoker",
+        "spawnWeight": 1,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      },
+      {
+        "mobID": "minecraft:stray",
+        "spawnWeight": 1,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      }
+    ]
+  }
+]
