@@ -65,7 +65,7 @@ public class EntityJsonHordeCommand {
                     builder.append(key).append(" ");
                 }
 
-                sourceStack.sendFailure(Component.translatable("villainoushordelibrary.json.notfound", builder.toString()));
+                sourceStack.sendFailure(Component.literal("Horde not found! Available hordes: " + builder));
             }
         }
         return 0;
@@ -86,7 +86,7 @@ public class EntityJsonHordeCommand {
             LOGGER.warn("VillainousHordeLibrary - hordeJsonData.json not found! No Json hordes are loaded!");
         }
 
-        sourceStack.sendSuccess(() -> Component.translatable("villainoushordelibrary.reload.success"), true);
+        sourceStack.sendSuccess(() -> Component.literal("Reload attempted."), true);
         return 0;
     }
 }
