@@ -18,9 +18,6 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
-import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.Evoker;
-import net.minecraft.world.entity.monster.Spider;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
@@ -30,18 +27,14 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.TickEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.slf4j.Logger;
-import com.cartoonishvillain.villainoushordelibrary.data.JsonMobData;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
-/*
- TODO: Steps until 0.5
 
- TODO: Clean up as many warnings as possible.
- */
 @Mod(VillainousHordeLibrary.MODID)
 public class VillainousHordeLibrary
 {
@@ -82,9 +75,9 @@ public class VillainousHordeLibrary
             );
             //This enum horde will consist of creepers, spiders, and vindicators in the overworld, and zombies, evokers, and skeletons in the nether.
             forgeTestEnumHorde.setHordeData(
-                    new EnumHordeData<>(2, 1, 1, ForgeTestHordeDataClass.CREEPEROVERZOMBIENETHER),
-                    new EnumHordeData<>(2, 1, 1, ForgeTestHordeDataClass.SPIDEROVEREVOKERNETHER),
-                    new EnumHordeData<>(2, 1, 1, ForgeTestHordeDataClass.VINDICATOROVERSKELETONNETHER)
+                    new EnumHordeData(2, 1, 1, ForgeTestHordeDataClass.CREEPEROVERZOMBIENETHER),
+                    new EnumHordeData(2, 1, 1, ForgeTestHordeDataClass.SPIDEROVEREVOKERNETHER),
+                    new EnumHordeData(2, 1, 1, ForgeTestHordeDataClass.VINDICATOROVERSKELETONNETHER)
             );
         }
 
@@ -125,12 +118,16 @@ public class VillainousHordeLibrary
         EntityJsonHordeCommand.register(event.getDispatcher());
     }
 
+    /**
+     * @param entity The entity you'd like to check the horde member status of
+     * @return if the entity in question has the horde movement goal or not.
+     */
     public static boolean isHordeMember(PathfinderMob entity) {
         GoalSelector mobGoalSelector = entity.goalSelector;
         Set<WrappedGoal> prioritizedGoals = mobGoalSelector.getAvailableGoals();
         Goal hordeGoal = null;
         for (WrappedGoal prioritizedGoal : prioritizedGoals) {
-            if (prioritizedGoal.getGoal() instanceof TypeHordeMovementGoal || prioritizedGoal.getGoal() instanceof EnumHordeMovementGoal) {
+            if (prioritizedGoal.getGoal() instanceof TypeHordeMovementGoal || prioritizedGoal.getGoal() instanceof EnumHordeMovementGoal || prioritizedGoal.getGoal() instanceof JsonHordeMovementGoal<?>) {
                 hordeGoal = prioritizedGoal.getGoal();
                 break;
             }

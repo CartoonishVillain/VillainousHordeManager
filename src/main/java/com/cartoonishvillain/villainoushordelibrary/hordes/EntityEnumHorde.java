@@ -40,7 +40,7 @@ public abstract class EntityEnumHorde {
     protected ArrayList<ServerPlayer> players = new ArrayList<>();
     protected ArrayList<LivingEntity> activeHordeMembers = new ArrayList<>();
     protected final ServerBossEvent bossInfo = new ServerBossEvent(Component.literal("EntityEnumHorde"), BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.PROGRESS);
-    protected ArrayList<EnumHordeData<?>> hordeData = new ArrayList<>();
+    protected ArrayList<EnumHordeData> hordeData = new ArrayList<>();
     protected Boolean despawnLeftBehindMembers = true;
 
     /**
@@ -313,7 +313,7 @@ public abstract class EntityEnumHorde {
     /**
      *   Begins the search for a valid spawnpoint for horde members.
      */
-    protected Optional<BlockPos> getValidSpawn(int var, EntityType type) {
+    protected Optional<BlockPos> getValidSpawn(int var, EntityType<?> type) {
         for (int i = 0; i < 3; ++i) {
             BlockPos blockPos = this.findRandomSpawnPos(var, type);
             if (blockPos != null) return Optional.of(blockPos);
@@ -324,13 +324,13 @@ public abstract class EntityEnumHorde {
     /**
      *   Finds the random spawn position for horde members
      */
-    protected BlockPos findRandomSpawnPos(int loopvar, EntityType type) {
+    protected BlockPos findRandomSpawnPos(int loopvar, EntityType<?> type) {
         BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
 
         for (int a = 0; a < loopvar; ++a) {
             double DISTANCE = -1;
             int j = Integer.MAX_VALUE, l = Integer.MAX_VALUE;
-            while ((DISTANCE == -1 || !(DISTANCE > 450 && DISTANCE < 1250))) { //check for appropriate distance from start and proper biome
+            while ((!(DISTANCE > 450 && DISTANCE < 1250))) { //check for appropriate distance from start and proper biome
                 j = randFinder(this.center.getX());
                 l = randFinder(this.center.getZ());
                 DISTANCE = center.distSqr(new BlockPos(j, center.getY(), l));
@@ -346,7 +346,7 @@ public abstract class EntityEnumHorde {
         //if a safe spot isn't found after loopvar tries, run the unfiltered search.
         double DISTANCE = -1;
         int j = Integer.MAX_VALUE, l = Integer.MAX_VALUE;
-        while ((DISTANCE == -1 || !(DISTANCE > 450 && DISTANCE < 1250))) { //check for appropriate distance from start and proper biome
+        while ((!(DISTANCE > 450 && DISTANCE < 1250))) { //check for appropriate distance from start and proper biome
             j = randFinder(this.center.getX());
             l = randFinder(this.center.getZ());
             DISTANCE = center.distSqr(new BlockPos(j, center.getY(), l));
@@ -364,7 +364,7 @@ public abstract class EntityEnumHorde {
     /**
      *   Usage: Finds the y spawnpoint for horde members.
      */
-    protected int findSafeYPosition(int xValue, int zValue, EntityType entityType, boolean unfiltered) {
+    protected int findSafeYPosition(int xValue, int zValue, EntityType<?> entityType, boolean unfiltered) {
         int height = Mth.ceil(entityType.getDimensions().height);
         int width = Mth.ceil(entityType.getDimensions().width);
         int maxHeight;
@@ -377,7 +377,7 @@ public abstract class EntityEnumHorde {
             minHeight = center.getY() - 25;
         }
         BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
-        BlockState blockState = null;
+        BlockState blockState;
         boolean safe = true;
         for (int baseYValue = center.getY(); baseYValue < maxHeight; baseYValue++) {
             blockPos.set(xValue, baseYValue - 1, zValue);
@@ -540,7 +540,7 @@ public abstract class EntityEnumHorde {
     /**
         Sets horde entity spawning data.
      */
-    public void setHordeData(EnumHordeData<?>... entityHordeData) {
+    public void setHordeData(EnumHordeData... entityHordeData) {
         this.hordeData.clear();
         hordeData.addAll(List.of(entityHordeData));
     }

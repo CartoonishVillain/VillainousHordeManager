@@ -1,12 +1,11 @@
 package com.cartoonishvillain.villainoushordelibrary.hordedata;
 
 import com.cartoonishvillain.villainoushordelibrary.RuleEnumInterface;
-import net.minecraft.world.entity.PathfinderMob;
 
 /*
     Used to store data about horde members in a map. Including spawn weight and goal priority to move towards the center.
  */
-public class EnumHordeData<T extends PathfinderMob> implements HordeData {
+public class EnumHordeData implements HordeData {
     private final RuleEnumInterface type;
     private final double goalMovementSpeed;
     private final int goalPriority;

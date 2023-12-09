@@ -39,7 +39,7 @@ public class EntityTypeHorde {
     protected ArrayList<ServerPlayer> players = new ArrayList<>();
     protected ArrayList<LivingEntity> activeHordeMembers = new ArrayList<>();
     protected final ServerBossEvent bossInfo = new ServerBossEvent(Component.literal("EntityTypeHorde"), BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.PROGRESS);
-    protected ArrayList<EntityTypeHordeData> hordeData = new ArrayList<>();
+    protected ArrayList<EntityTypeHordeData<?>> hordeData = new ArrayList<>();
     protected Boolean despawnLeftBehindMembers = true;
 
     /**
@@ -48,7 +48,7 @@ public class EntityTypeHorde {
     public enum HordeStopReasons {
         VICTORY, //Players beat the event
         DEFEAT, //Players are defeated or quit the event.
-        PEACEFUL, //Server changed to peaceful mid horde, event canceled.
+        PEACEFUL, //Server changed to peaceful mid-horde, event canceled.
         SPAWN_ERROR  //Players are in a position that causes the spawn manager to panic and shut down the event before it hangs the server.
     }
 
@@ -79,17 +79,10 @@ public class EntityTypeHorde {
         players.clear();
 
         switch (stopReason) {
-            case VICTORY -> {
-                VillainousHordeLibrary.LOGGER.info("Player Victory against EntityTypeHorde");
-            }
-            case DEFEAT -> {
-                VillainousHordeLibrary.LOGGER.info("Player Defeat against EntityTypeHorde");
-            } case SPAWN_ERROR ->  {
-                VillainousHordeLibrary.LOGGER.error("EntityTypeHorde canceled! Could not locate spawn placement! (Entities are too big, or terrain is too noisy)");
-            }
-            case PEACEFUL -> {
-                VillainousHordeLibrary.LOGGER.info("EntityTypeHorde canceled, server changed to peaceful!");
-            }
+            case VICTORY -> VillainousHordeLibrary.LOGGER.info("Player Victory against EntityTypeHorde");
+            case DEFEAT -> VillainousHordeLibrary.LOGGER.info("Player Defeat against EntityTypeHorde");
+            case SPAWN_ERROR -> VillainousHordeLibrary.LOGGER.error("EntityTypeHorde canceled! Could not locate spawn placement! (Entities are too big, or terrain is too noisy)");
+            case PEACEFUL -> VillainousHordeLibrary.LOGGER.info("EntityTypeHorde canceled, server changed to peaceful!");
         }
 
     }
@@ -115,17 +108,12 @@ public class EntityTypeHorde {
                 hordeAnchorPlayer = serverPlayer;
                 //Set alive counter based on difficulty
                 switch (world.getDifficulty()) {
-                    case EASY:
-                        setEasyDifficultyStats();
-                        break;
-                    case NORMAL:
-                        setNormalDifficultyStats();
-                        break;
-                    case HARD:
-                        setHardDifficultyStats();
-                        break;
-                    case PEACEFUL:
+                    case EASY -> setEasyDifficultyStats();
+                    case NORMAL -> setNormalDifficultyStats();
+                    case HARD -> setHardDifficultyStats();
+                    case PEACEFUL -> {
                         return;
+                    }
                 }
 
                 setActiveMemberCount();
@@ -328,7 +316,7 @@ public class EntityTypeHorde {
     /**
      *   Begins the search for a valid spawnpoint for horde members.
      */
-    protected Optional<BlockPos> getValidSpawn(int var, EntityType type) {
+    protected Optional<BlockPos> getValidSpawn(int var, EntityType<?> type) {
         for (int i = 0; i < 3; ++i) {
             BlockPos blockPos = this.findRandomSpawnPos(var, type);
             if (blockPos != null) return Optional.of(blockPos);
@@ -339,13 +327,13 @@ public class EntityTypeHorde {
     /**
      *   Finds the random spawn position for horde members
      */
-    protected BlockPos findRandomSpawnPos(int loopvar, EntityType type) {
+    protected BlockPos findRandomSpawnPos(int loopvar, EntityType<?> type) {
         BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
 
         for (int a = 0; a < loopvar; ++a) {
             double DISTANCE = -1;
             int j = Integer.MAX_VALUE, l = Integer.MAX_VALUE;
-            while ((DISTANCE == -1 || !(DISTANCE > 450 && DISTANCE < 1250))) { //check for appropriate distance from start and proper biome
+            while ((!(DISTANCE > 450 && DISTANCE < 1250))) { //check for appropriate distance from start and proper biome
                 j = randFinder(this.center.getX());
                 l = randFinder(this.center.getZ());
                 DISTANCE = center.distSqr(new BlockPos(j, center.getY(), l));
@@ -361,7 +349,7 @@ public class EntityTypeHorde {
         //if a safe spot isn't found after loopvar tries, run the unfiltered search.
         double DISTANCE = -1;
         int j = Integer.MAX_VALUE, l = Integer.MAX_VALUE;
-        while ((DISTANCE == -1 || !(DISTANCE > 450 && DISTANCE < 1250))) { //check for appropriate distance from start and proper biome
+        while ((!(DISTANCE > 450 && DISTANCE < 1250))) { //check for appropriate distance from start and proper biome
             j = randFinder(this.center.getX());
             l = randFinder(this.center.getZ());
             DISTANCE = center.distSqr(new BlockPos(j, center.getY(), l));
@@ -379,7 +367,7 @@ public class EntityTypeHorde {
     /**
      *   Usage: Finds the y spawnpoint for horde members.
      */
-    protected int findSafeYPosition(int xValue, int zValue, EntityType entityType, boolean unfiltered) {
+    protected int findSafeYPosition(int xValue, int zValue, EntityType<?> entityType, boolean unfiltered) {
         int height = Mth.ceil(entityType.getDimensions().height);
         int width = Mth.ceil(entityType.getDimensions().width);
         int maxHeight;
@@ -392,7 +380,7 @@ public class EntityTypeHorde {
             minHeight = center.getY() - 25;
         }
         BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
-        BlockState blockState = null;
+        BlockState blockState;
         boolean safe = true;
         for (int baseYValue = center.getY(); baseYValue < maxHeight; baseYValue++) {
             blockPos.set(xValue, baseYValue - 1, zValue);
@@ -484,7 +472,7 @@ public class EntityTypeHorde {
     protected void spawnHordeMember() {
         Optional<BlockPos> hordeSpawn = Optional.empty();
         ArrayList<Integer> SpawnWeights = new ArrayList<>();
-        for (EntityTypeHordeData hordeEntry : hordeData) {
+        for (EntityTypeHordeData<?> hordeEntry : hordeData) {
             SpawnWeights.add(hordeEntry.getSpawnWeight());
         }
         int combined = 0;
@@ -501,7 +489,7 @@ public class EntityTypeHorde {
             rng -= weights;
         }
 
-        EntityTypeHordeData entrySelected = hordeData.get(selected);
+        EntityTypeHordeData<?> entrySelected = hordeData.get(selected);
         PathfinderMob pathfinderMob = entrySelected.createInstance(world);
 
         int attempts = 0;
@@ -542,7 +530,7 @@ public class EntityTypeHorde {
     /**
      *   Injects the horde movement and swarming goal into the entity.
      */
-    public void injectGoal(PathfinderMob entity, EntityTypeHordeData entityHordeData, double movementSpeedModifier) {
+    public void injectGoal(PathfinderMob entity, EntityTypeHordeData<?> entityHordeData, double movementSpeedModifier) {
         GoalSelector mobGoalSelector = entity.goalSelector;
         mobGoalSelector.addGoal(entityHordeData.getGoalPriority(), new TypeHordeMovementGoal<>(entity, this, movementSpeedModifier));
     }
@@ -568,7 +556,7 @@ public class EntityTypeHorde {
     /**
         Sets horde entity spawning data.
      */
-    public void setHordeData(EntityTypeHordeData... entityHordeData) {
+    public void setHordeData(EntityTypeHordeData<?>... entityHordeData) {
         this.hordeData.clear();
         hordeData.addAll(List.of(entityHordeData));
     }

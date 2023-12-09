@@ -38,7 +38,7 @@ public class EntityJsonHordeCommand {
             if (VillainousHordeLibrary.gsonHordes.containsKey(hordeName)) {
                 //we have the horde, load the horde.
                 JsonHordes jsonHordeData = VillainousHordeLibrary.gsonHordes.get(hordeName);
-                ArrayList<EntityTypeHordeData> hordeMobData = new ArrayList<>();
+                ArrayList<EntityTypeHordeData<?>> hordeMobData = new ArrayList<>();
                 for (JsonMobData data : jsonHordeData.getMobData()) {
                     Optional<EntityType<?>> type = EntityType.byString(data.getMobID());
                     if (type.isEmpty()) {
@@ -50,7 +50,7 @@ public class EntityJsonHordeCommand {
 
                 VillainousHordeLibrary.jsonHorde = new JsonHorde(sourceStack.getServer(), jsonHordeData.getKillsRequiredForEasy(),
                         jsonHordeData.getKillsRequiredForNormal(), jsonHordeData.getKillsRequiredForHard(), jsonHordeData.getMaximumActiveHordeMembers(),
-                        jsonHordeData.getBossInfoText(), jsonHordeData.getBossInfoColor(), jsonHordeData.getHordeName(), hordeMobData);
+                        jsonHordeData.getBossInfoText(), jsonHordeData.getBossInfoColor(), jsonHordeData.getHordeName(), jsonHordeData.isDespawnLeftBehindMembers(), hordeMobData);
 
                 VillainousHordeLibrary.jsonHorde.SetUpHorde(Objects.requireNonNull(sourceStack.getPlayer()));
             } else {
@@ -68,8 +68,8 @@ public class EntityJsonHordeCommand {
     }
 
     private static int stopHorde(CommandSourceStack sourceStack) {
-        if (!sourceStack.getLevel().isClientSide && VillainousHordeLibrary.forgeTestEnumHorde != null && VillainousHordeLibrary.forgeTestEnumHorde.getHordeActive())
-            VillainousHordeLibrary.forgeTestEnumHorde.Stop(EntityEnumHorde.HordeStopReasons.DEFEAT);
+        if (!sourceStack.getLevel().isClientSide && VillainousHordeLibrary.jsonHorde != null && VillainousHordeLibrary.jsonHorde.getHordeActive())
+            VillainousHordeLibrary.jsonHorde.Stop(JsonHorde.HordeStopReasons.DEFEAT);
         return 0;
     }
 }

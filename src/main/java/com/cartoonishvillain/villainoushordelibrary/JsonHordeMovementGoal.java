@@ -1,6 +1,5 @@
 package com.cartoonishvillain.villainoushordelibrary;
 
-import com.cartoonishvillain.villainoushordelibrary.hordes.EntityTypeHorde;
 import com.cartoonishvillain.villainoushordelibrary.hordes.JsonHorde;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
