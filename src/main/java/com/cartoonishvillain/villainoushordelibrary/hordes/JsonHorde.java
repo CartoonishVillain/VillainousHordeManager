@@ -175,8 +175,8 @@ public class JsonHorde {
      *   Recommend you override to set up your own way of setting this up (whether by configs or other means)
      */
     public void setEasyDifficultyStats() {
-        Alive = 10;
-        initAlive = 10;
+        Alive = easyKillCount;
+        initAlive = easyKillCount;
     }
 
     /**
@@ -184,8 +184,8 @@ public class JsonHorde {
      *   Recommend you override to set up your own way of setting this up (whether by configs or other means)
      */
     public void setNormalDifficultyStats() {
-        Alive = 25;
-        initAlive = 25;
+        Alive = normalKillCount;
+        initAlive = normalKillCount;
     }
 
     /**
@@ -193,8 +193,8 @@ public class JsonHorde {
      *   Recommend you override to set up your own way of setting this up (whether by configs or other means)
      */
     public void setHardDifficultyStats() {
-        Alive = 40;
-        initAlive = 40;
+        Alive = hardKillCount;
+        initAlive = hardKillCount;
     }
 
     /**
