@@ -6,7 +6,7 @@ public class JsonMobData implements Serializable {
     String mobID;
     Integer spawnWeight;
     Integer goalPriority;
-    Integer goalMovementSpeed;
+    Float goalMovementSpeed;
 
     public String getMobID() {
         return mobID;
@@ -20,7 +20,7 @@ public class JsonMobData implements Serializable {
         return goalPriority;
     }
 
-    public Integer getGoalMovementSpeed() {
+    public Float getGoalMovementSpeed() {
         return goalMovementSpeed;
     }
 

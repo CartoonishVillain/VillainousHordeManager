@@ -62,7 +62,6 @@ public class VillainousHordeLibrary
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event)
     {
-        //TODO EntityType.byString()
         if (!FMLLoader.isProduction()) {
             //Step 1 - Instantiate
             entityTypeHorde = new EntityTypeHorde(event.getServer());
@@ -82,16 +81,20 @@ public class VillainousHordeLibrary
         }
 
         try {
-            JsonReader reader = new JsonReader(new FileReader("hordeJsonData.json"));
-            JsonHordes[] hordesArray = new Gson().fromJson(reader, JsonHordes[].class);
-            ArrayList<JsonHordes> hordesArrayList = new ArrayList<>(Arrays.stream(hordesArray).toList());
-            for (JsonHordes hordes : hordesArrayList) {
-                gsonHordes.put(hordes.getHordeName(), hordes);
-            }
+            loadHordes();
         } catch (FileNotFoundException e) {
             LOGGER.warn("VillainousHordeLibrary - hordeJsonData.json not found! No Json hordes are loaded!");
         }
 
+    }
+
+    public static void loadHordes() throws FileNotFoundException {
+        JsonReader reader = new JsonReader(new FileReader("hordeJsonData.json"));
+        JsonHordes[] hordesArray = new Gson().fromJson(reader, JsonHordes[].class);
+        ArrayList<JsonHordes> hordesArrayList = new ArrayList<>(Arrays.stream(hordesArray).toList());
+        for (JsonHordes hordes : hordesArrayList) {
+            gsonHordes.put(hordes.getHordeName(), hordes);
+        }
     }
 
     @SubscribeEvent
