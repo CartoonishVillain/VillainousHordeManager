@@ -6,8 +6,10 @@ import com.cartoonishvillain.villainoushordelibrary.hordes.EntityEnumHorde;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.monster.*;
+import net.neoforged.neoforge.event.EventHooks;
 
 import java.util.Optional;
 
@@ -57,6 +59,7 @@ public class ForgeTestEnumHorde extends EntityEnumHorde {
 
             mobToSpawn.setPos(hordeSpawn.get().getX(), hordeSpawn.get().getY(), hordeSpawn.get().getZ());
             injectGoal(mobToSpawn, entrySelected, entrySelected.getGoalMovementSpeed());
+            EventHooks.onFinalizeSpawn(mobToSpawn, world, mobToSpawn.level().getCurrentDifficultyAt(mobToSpawn.getOnPos()), MobSpawnType.EVENT, null, null);
             world.addFreshEntity(mobToSpawn);
             SpawnUnit();
             activeHordeMembers.add(mobToSpawn);

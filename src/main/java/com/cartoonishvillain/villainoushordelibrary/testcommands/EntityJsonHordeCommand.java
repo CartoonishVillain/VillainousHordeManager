@@ -54,7 +54,7 @@ public class EntityJsonHordeCommand {
                 }
 
                 VillainousHordeLibrary.jsonHorde = new JsonHorde(sourceStack.getServer(), jsonHordeData.getKillsRequiredForEasy(),
-                        jsonHordeData.getKillsRequiredForNormal(), jsonHordeData.getKillsRequiredForHard(), jsonHordeData.getMaximumActiveHordeMembers(),
+                        jsonHordeData.getKillsRequiredForNormal(), jsonHordeData.getKillsRequiredForHard(), jsonHordeData.getMaximumActiveHordeMembers(), jsonHordeData.getFindSpawnAttempts(),
                         jsonHordeData.getBossInfoText(), jsonHordeData.getBossInfoColor(), jsonHordeData.getHordeName(), jsonHordeData.isDespawnLeftBehindMembers(), hordeMobData);
 
                 VillainousHordeLibrary.jsonHorde.SetUpHorde(Objects.requireNonNull(sourceStack.getPlayer()));

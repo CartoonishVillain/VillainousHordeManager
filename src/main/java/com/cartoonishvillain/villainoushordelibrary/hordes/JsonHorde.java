@@ -2,7 +2,6 @@ package com.cartoonishvillain.villainoushordelibrary.hordes;
 
 import com.cartoonishvillain.villainoushordelibrary.JsonHordeMovementGoal;
 import com.cartoonishvillain.villainoushordelibrary.TypeHordeMovementGoal;
-import com.cartoonishvillain.villainoushordelibrary.VillainousHordeLibrary;
 import com.cartoonishvillain.villainoushordelibrary.hordedata.EntityTypeHordeData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -13,18 +12,18 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.event.EventHooks;
 
 import java.util.*;
+
+import static com.cartoonishvillain.villainoushordelibrary.VillainousHordeLibrary.LOGGER;
 
 public class JsonHorde {
     protected ServerLevel world;
@@ -46,6 +45,7 @@ public class JsonHorde {
     protected int easyKillCount;
     protected int normalKillCount;
     protected int hardKillCount;
+    protected int spawnAttemptsBeforeCancel;
 
     /**
      * The enum of reasons why the Horde may end.
@@ -67,6 +67,7 @@ public class JsonHorde {
             int normalKills,
             int hardKills,
             int aliveLimit,
+            int spawnAttempts,
             String bossText,
             String color,
             String hordeName,
@@ -92,6 +93,7 @@ public class JsonHorde {
 
         despawnLeftBehindMembers = leftBehindMembersDespawn;
         bossInfo = new ServerBossEvent(Component.literal(bossText), bossColor, BossEvent.BossBarOverlay.PROGRESS);
+        spawnAttemptsBeforeCancel = spawnAttempts;
     }
 
 
@@ -113,10 +115,10 @@ public class JsonHorde {
         players.clear();
 
         switch (stopReason) {
-            case VICTORY -> VillainousHordeLibrary.LOGGER.info("Player Victory against " + hordeName);
-            case DEFEAT -> VillainousHordeLibrary.LOGGER.info("Player Defeat against" + hordeName);
-            case SPAWN_ERROR -> VillainousHordeLibrary.LOGGER.error(hordeName + " canceled! Could not locate spawn placement! (Entities are too big, or terrain is too noisy)");
-            case PEACEFUL -> VillainousHordeLibrary.LOGGER.info(hordeName + " canceled, server changed to peaceful!");
+            case VICTORY -> LOGGER.info("Player Victory against " + hordeName);
+            case DEFEAT -> LOGGER.info("Player Defeat against" + hordeName);
+            case SPAWN_ERROR -> LOGGER.error(hordeName + " canceled! Could not locate spawn placement! (Entities are too big, or terrain is too noisy)");
+            case PEACEFUL -> LOGGER.info(hordeName + " canceled, server changed to peaceful!");
         }
 
     }
@@ -524,11 +526,20 @@ public class JsonHorde {
         }
 
         EntityTypeHordeData<?> entrySelected = hordeData.get(selected);
-        PathfinderMob pathfinderMob = entrySelected.createInstance(world);
+        PathfinderMob pathfinderMob;
+
+        try {
+             pathfinderMob = entrySelected.createInstance(world);
+        } catch (ClassCastException e) {
+            this.Stop(HordeStopReasons.SPAWN_ERROR);
+            LOGGER.error("Villainous Horde Manager - WARNING! One or more of the mobs in your JSON horde are not a descendant of PathfinderMob. Horde canceled due to this.");
+            return;
+        }
+
 
         int attempts = 0;
         while (hordeSpawn.isEmpty()) {
-            hordeSpawn = this.getValidSpawn(10, entrySelected.getType());
+            hordeSpawn = this.getValidSpawn(spawnAttemptsBeforeCancel, entrySelected.getType());
             attempts++;
             if (hordeSpawn.isEmpty() && attempts >= 5) {
                 this.Stop(HordeStopReasons.SPAWN_ERROR);
@@ -540,6 +551,7 @@ public class JsonHorde {
         if (pathfinderMob != null) {
             pathfinderMob.setPos(hordeSpawn.get().getX(), hordeSpawn.get().getY(), hordeSpawn.get().getZ());
             injectGoal(pathfinderMob, entrySelected, entrySelected.getGoalMovementSpeed());
+            EventHooks.onFinalizeSpawn(pathfinderMob, world, pathfinderMob.level().getCurrentDifficultyAt(pathfinderMob.getOnPos()), MobSpawnType.EVENT, null, null);
             world.addFreshEntity(pathfinderMob);
             SpawnUnit();
             activeHordeMembers.add(pathfinderMob);

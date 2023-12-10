@@ -13,6 +13,7 @@ There are two ways you can make your own horde events.
 * hordeName: The name that may appear in the logs for your horde, and the name you use to start the horde. (Should be one word, no spaces.)
 * maximumActiveHordeMembers: The mob spawncap at a given moment for the horde. (Integer)
 * killsRequiredForEasy(/Normal/Hard): The amount of kills required, per difficulty, to triumph over the horde event. (Integer)
+* findSpawnAttempts: How many times should the game look for spawn points? The higher the number, the less likely you are to have hordes end randomly due to being unable to find a spawn point. Higher values will lead to potentially more resource usage in complex environments as it uses more time to find spawn points, though. (Integer)
 * bossInfoText: What is the label of the boss bar for the horde event?
 * bossInfoColor: What color is the boss bar?
   * Only supports: green, blue, pink, red, purple, and yellow. Any other value will be white.

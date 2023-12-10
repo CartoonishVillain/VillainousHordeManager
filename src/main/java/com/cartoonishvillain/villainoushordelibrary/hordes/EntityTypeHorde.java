@@ -12,16 +12,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.event.EventHooks;
 
 import java.util.*;
 
@@ -506,6 +504,7 @@ public class EntityTypeHorde {
         if (pathfinderMob != null) {
             pathfinderMob.setPos(hordeSpawn.get().getX(), hordeSpawn.get().getY(), hordeSpawn.get().getZ());
             injectGoal(pathfinderMob, entrySelected, entrySelected.getGoalMovementSpeed());
+            EventHooks.onFinalizeSpawn(pathfinderMob, world, pathfinderMob.level().getCurrentDifficultyAt(pathfinderMob.getOnPos()), MobSpawnType.EVENT, null, null);
             world.addFreshEntity(pathfinderMob);
             SpawnUnit();
             activeHordeMembers.add(pathfinderMob);

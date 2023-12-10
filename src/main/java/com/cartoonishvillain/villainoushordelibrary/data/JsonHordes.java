@@ -11,8 +11,13 @@ public class JsonHordes implements Serializable {
     Integer killsRequiredForHard;
     String bossInfoText;
     String bossInfoColor;
+    Integer findSpawnAttempts;
     boolean despawnLeftBehindMembers;
     ArrayList<JsonMobData> mobData;
+
+    public Integer getFindSpawnAttempts() {
+        return findSpawnAttempts;
+    }
 
     public String getHordeName() {
         return hordeName;

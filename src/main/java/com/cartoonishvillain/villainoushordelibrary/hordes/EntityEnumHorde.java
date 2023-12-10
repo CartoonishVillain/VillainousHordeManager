@@ -491,7 +491,8 @@ public abstract class EntityEnumHorde {
 
     /**
      * Usage - This is the method you'll use to spawn your entity based on the enum provided in selectHordeMember
-     * the enum, of course, should extend RuleEnumInterface.
+     * the enum, of course, should extend RuleEnumInterface. Make sure, when you spawn a mob, that you run EventHooks.onFinalizeSpawn.
+     * If you don't, mobs may not spawn as you expect them to.
      * @param enumSelected - The enum chosen.
      * @param entrySelected - The data associated with the chosen mob.
      */
