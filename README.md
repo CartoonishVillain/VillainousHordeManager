@@ -5,7 +5,7 @@ The villainous horde manager (or villainous horde library) is a mod designed to 
 
 There are two ways you can make your own horde events.
 * If you have a mod, and would like to directly integrate into the code base for greater control over the horde systems, you can extend the horde classes and follow the examples in the VillainousHordeLibrary file.
-* If you want a quick horde setup, you can follow the example set by hordeJsonData.json. Once the json is complete, you only need to place the file in the version directory (outside of the mods folder).
+* If you want a quick horde setup, you can follow the example set by hordeJsonData.json. Once the json is complete, you only need to place the file in the server/minecraft directory (just outside of the mods folder).
   * When you do this, you can start your horde with /hordeLibrary startJsonHorde <hordeName>, if you have cheats enabled or operator level 2 permissions.
   * The data in this case has precise requirements. If these are not followed, crashes or other assorted weird things may occur. Notes will be given per data point.
  
@@ -20,7 +20,7 @@ There are two ways you can make your own horde events.
 * despawnLeftBehindMembers: An optimization toggle. If a user runs away from the horde members, and they end up out of range, do we despawn them? (true/false)
 
 ### Information for horde members and horde member data entry (also most relevant for JSON hordes, but information can be helpful to all):
-* mobID: the ID of a given mob, such as minecraft:creeper for creepers. (If the mob listed is not a pathfinding mob, the game **will** crash.)
+* mobID: the ID of a given mob, such as `minecraft:creeper` for creepers. (If the mob listed is not a pathfinding mob, the game *shouldn't* crash, but it could. Instead it should just end the horde with an error in the logs.)
 * spawnWeight: the likelihood this mob spawns in a horde, when compared to all other spawn weights in the horde. (Integer)
 * goalPriority: the priority level the "move towards the center player" goal of the horde is in. This may take some tweaking to get right, but for vanilla mobs 2 is *usually* a safe bet. (Integer)
 * goalMovementSpeed: the speed of which mobs try to get to the horde center player. 1 is usually recommended, as this is a speed multiplier, but tinker with it to your heart's content. (Floating point number (Use decimals, if you want.))
