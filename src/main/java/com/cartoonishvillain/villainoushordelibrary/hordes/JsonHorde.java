@@ -16,6 +16,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.level.NaturalSpawner;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -46,6 +47,7 @@ public class JsonHorde {
     protected int normalKillCount;
     protected int hardKillCount;
     protected int spawnAttemptsBeforeCancel;
+    ArrayList<Integer> spawnWeights = new ArrayList<>();
 
     /**
      * The enum of reasons why the Horde may end.
@@ -155,6 +157,10 @@ public class JsonHorde {
                 setActiveMemberCount();
                 setCenterBlock(serverPlayer.blockPosition());
                 hordeActive = true;
+                spawnWeights = new ArrayList<>();
+                for (EntityTypeHordeData<?> hordeEntry : hordeData) {
+                    spawnWeights.add(hordeEntry.getSpawnWeight());
+                }
             }
         }
     }
@@ -404,8 +410,6 @@ public class JsonHorde {
      *   Usage: Finds the y spawnpoint for horde members.
      */
     protected int findSafeYPosition(int xValue, int zValue, EntityType<?> entityType, boolean unfiltered) {
-        int height = Mth.ceil(entityType.getDimensions().height);
-        int width = Mth.ceil(entityType.getDimensions().width);
         int maxHeight;
         int minHeight;
         if (unfiltered) {
@@ -417,50 +421,26 @@ public class JsonHorde {
         }
         BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
         BlockState blockState;
-        boolean safe = true;
         for (int baseYValue = center.getY(); baseYValue < maxHeight; baseYValue++) {
             blockPos.set(xValue, baseYValue - 1, zValue);
             blockState = world.getBlockState(blockPos);
-            if (!(blockState.canOcclude() && blockState.getFluidState().isEmpty() && !(blockState.getBlock() instanceof LeavesBlock) && !(blockState.equals(Blocks.BEDROCK.defaultBlockState())))) {
+            if (!NaturalSpawner.isSpawnPositionOk(SpawnPlacements.Type.ON_GROUND, world, blockPos, entityType) || blockState.equals(Blocks.BEDROCK.defaultBlockState())) {
                 //if there is no floor, don't bother.
                 continue;
             }
-            for (int i = xValue - width; i < xValue + width; i++) {
-                for (int j = zValue - width; j < zValue + width; j++) {
-                    for (int k = baseYValue; k < baseYValue + height; k++) {
-                        blockPos.set(i, k, j );
-                        blockState = world.getBlockState(blockPos);
-                        if (!blockState.getFluidState().isEmpty() || blockState.canOcclude() || (blockState.getBlock() instanceof LeavesBlock)) {
-                            safe = false;
-                        }
-                    }
-                }
-            }
-            if (safe) return baseYValue+1;
+            return baseYValue;
         }
 
         //Look below the player if a valid spot above isn't found
         for (int baseYValue = center.getY(); baseYValue > minHeight; baseYValue--) {
             blockPos.set(xValue, baseYValue - 1, zValue);
             blockState = world.getBlockState(blockPos);
-            if (!(blockState.canOcclude() && blockState.getFluidState().isEmpty() && !(blockState.getBlock() instanceof LeavesBlock) && !(blockState.equals(Blocks.BEDROCK.defaultBlockState())))) {
+            if (!NaturalSpawner.isSpawnPositionOk(SpawnPlacements.Type.ON_GROUND, world, blockPos, entityType) || blockState.equals(Blocks.BEDROCK.defaultBlockState())) {
                 //if there is no floor, don't bother.
                 continue;
             }
-            for (int i = xValue - width; i < xValue + width; i++) {
-                for (int j = zValue - width; j < zValue + width; j++) {
-                    for (int k = baseYValue; k < baseYValue + height; k++) {
-                        blockPos.set(i, k, j);
-                        blockState = world.getBlockState(blockPos);
-                        if (!blockState.getFluidState().isEmpty() || blockState.canOcclude() || (blockState.getBlock() instanceof LeavesBlock)) {
-                            safe = false;
-                        }
-                    }
-                }
-            }
-            if (safe) return baseYValue+1;
+            return baseYValue;
         }
-
         return world.getMinBuildHeight() - 1;
     }
 
@@ -507,17 +487,14 @@ public class JsonHorde {
      */
     protected void spawnHordeMember() {
         Optional<BlockPos> hordeSpawn = Optional.empty();
-        ArrayList<Integer> SpawnWeights = new ArrayList<>();
-        for (EntityTypeHordeData<?> hordeEntry : hordeData) {
-            SpawnWeights.add(hordeEntry.getSpawnWeight());
-        }
+
         int combined = 0;
-        for (Integer weight : SpawnWeights) combined += weight;
+        for (Integer weight : spawnWeights) combined += weight;
         Random random = new Random();
         int rng = random.nextInt(combined);
         int selected = -1;
         int counter = 0;
-        for (Integer weights : SpawnWeights) {
+        for (Integer weights : spawnWeights) {
             if ((rng + 1 - weights) <= 0) {
                 selected = counter;
                 break;

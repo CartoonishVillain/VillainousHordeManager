@@ -9,7 +9,7 @@ import net.minecraft.world.entity.PathfinderMob;
     Used to store data about horde members in a map. Including spawn weight and goal priority to move towards the center.
  */
 public class EntityTypeHordeData<T extends PathfinderMob> implements HordeData {
-    private final EntityType<?> type;
+    private final EntityType<? extends PathfinderMob> type;
     private final double goalMovementSpeed;
     private final int goalPriority;
     private final int spawnWeight;
@@ -21,7 +21,7 @@ public class EntityTypeHordeData<T extends PathfinderMob> implements HordeData {
         this.type = type;
     }
 
-    public EntityTypeHordeData(Integer goalPriority, Integer goalMovementSpeed, Integer spawnWeight, EntityType<?> entityType) {
+    public EntityTypeHordeData(Integer goalPriority, Integer goalMovementSpeed, Integer spawnWeight, EntityType<? extends PathfinderMob> entityType) {
         this.goalPriority = goalPriority;
         this.goalMovementSpeed = goalMovementSpeed;
         this.spawnWeight = spawnWeight;
@@ -40,7 +40,7 @@ public class EntityTypeHordeData<T extends PathfinderMob> implements HordeData {
         return spawnWeight;
     }
 
-    public EntityType<?> getType() {
+    public EntityType<? extends PathfinderMob> getType() {
         return type;
     }
 

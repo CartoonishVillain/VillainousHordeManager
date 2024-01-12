@@ -13,6 +13,9 @@ import com.cartoonishvillain.villainoushordelibrary.testcommands.EntityTypeHorde
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.mojang.logging.LogUtils;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.tags.BiomeTagsProvider;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -23,8 +26,10 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.TickEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.slf4j.Logger;
 
@@ -55,6 +60,20 @@ public class VillainousHordeLibrary
     {
         // Register ourselves for server and other game events we are interested in
         NeoForge.EVENT_BUS.register(this);
+        modEventBus.addListener(this::gatherData);
+
+    }
+
+    public void gatherData(GatherDataEvent event) {
+        event.getGenerator().addProvider(
+                event.includeServer(),
+                (DataProvider.Factory<BiomeTagsProvider>) output -> new BiomeTagsProvider(
+                        output,
+                        event.getLookupProvider(),
+                        MODID,
+                        event.getExistingFileHelper()
+                )
+        );
     }
 
 
@@ -86,6 +105,13 @@ public class VillainousHordeLibrary
             LOGGER.warn("VillainousHordeLibrary - hordeJsonData.json not found! No Json hordes are loaded!");
         }
 
+    }
+
+    @SubscribeEvent
+    public void onEntityDamaged(LivingDamageEvent event) {
+        if (event.getEntity() instanceof PathfinderMob && isHordeMember((PathfinderMob) event.getEntity()) && event.getEntity().tickCount < 2) {
+            event.getEntity().remove(Entity.RemovalReason.DISCARDED);
+        }
     }
 
     public static void loadHordes() throws FileNotFoundException {
