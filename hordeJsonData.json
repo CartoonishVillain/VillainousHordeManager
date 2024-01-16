@@ -1,0 +1,238 @@
+[
+  {
+    "hordeName": "swarm1",
+    "maximumActiveHordeMembers": 8,
+    "killsRequiredForEasy": 15,
+    "killsRequiredForNormal": 30,
+    "killsRequiredForHard": 45,
+    "bossInfoText": "The swarm begins!",
+    "bossInfoColor": "red",
+    "findSpawnAttempts": 50,
+    "despawnLeftBehindMembers": true,
+    "mobData": [
+      {
+        "mobID": "minecraft:zombie",
+        "spawnWeight": 3,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      },
+      {
+        "mobID": "minecraft:skeleton",
+        "spawnWeight": 1,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      }
+    ]
+  },
+  {
+    "hordeName": "swarm2",
+    "maximumActiveHordeMembers": 10,
+    "killsRequiredForEasy": 30,
+    "killsRequiredForNormal": 45,
+    "killsRequiredForHard": 60,
+    "bossInfoText": "Feeling Ill",
+    "bossInfoColor": "purple",
+    "findSpawnAttempts": 50,
+    "despawnLeftBehindMembers": true,
+    "mobData": [
+      {
+        "mobID": "minecraft:evoker",
+        "spawnWeight": 1,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      },
+      {
+        "mobID": "minecraft:vindicator",
+        "spawnWeight": 2,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      },
+      {
+        "mobID": "minecraft:pillager",
+        "spawnWeight": 2,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      }
+    ]
+  },
+  {
+    "hordeName": "swarm3",
+    "maximumActiveHordeMembers": 50,
+    "killsRequiredForEasy": 30,
+    "killsRequiredForNormal": 45,
+    "killsRequiredForHard": 60,
+    "bossInfoText": "Exploder Infestation",
+    "bossInfoColor": "green",
+    "findSpawnAttempts": 50,
+    "despawnLeftBehindMembers": true,
+    "mobData": [
+      {
+        "mobID": "minecraft:phantom",
+        "spawnWeight": 1,
+        "goalPriority": 2,
+        "goalMovementSpeed": 5
+      }
+    ]
+  },
+  {
+    "hordeName": "swarm4",
+    "maximumActiveHordeMembers": 14,
+    "killsRequiredForEasy": 30,
+    "killsRequiredForNormal": 45,
+    "killsRequiredForHard": 60,
+    "bossInfoText": "The Sprinting (Un)dead",
+    "bossInfoColor": "red",
+    "findSpawnAttempts": 50,
+    "despawnLeftBehindMembers": true,
+    "mobData": [
+      {
+        "mobID": "minecraft:zombie",
+        "spawnWeight": 2,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1.5
+      },
+      {
+        "mobID": "minecraft:skeleton",
+        "spawnWeight": 1,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1.25
+      },
+      {
+        "mobID": "minecraft:husk",
+        "spawnWeight": 2,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1.5
+      },
+      {
+        "mobID": "minecraft:stray",
+        "spawnWeight": 1,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1.25
+      }
+    ]
+  },
+  {
+    "hordeName": "swarm5",
+    "maximumActiveHordeMembers": 15,
+    "killsRequiredForEasy": 30,
+    "killsRequiredForNormal": 45,
+    "killsRequiredForHard": 60,
+    "bossInfoText": "Infernal Beasts",
+    "bossInfoColor": "yellow",
+    "findSpawnAttempts": 50,
+    "despawnLeftBehindMembers": true,
+    "mobData": [
+      {
+        "mobID": "minecraft:blaze",
+        "spawnWeight": 2,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      },
+      {
+        "mobID": "minecraft:zoglin",
+        "spawnWeight": 2,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      },
+      {
+        "mobID": "minecraft:piglin_brute",
+        "spawnWeight": 1,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      }
+    ]
+  },
+  {
+    "hordeName": "swarm6",
+    "maximumActiveHordeMembers": 18,
+    "killsRequiredForEasy": 30,
+    "killsRequiredForNormal": 45,
+    "killsRequiredForHard": 60,
+    "bossInfoText": "Poseidon's Navy",
+    "bossInfoColor": "blue",
+    "findSpawnAttempts": 50,
+    "despawnLeftBehindMembers": true,
+    "mobData": [
+      {
+        "mobID": "minecraft:drowned",
+        "spawnWeight": 5,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      },
+      {
+        "mobID": "minecraft:guardian",
+        "spawnWeight": 3,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      },
+      {
+        "mobID": "minecraft:elder_guardian",
+        "spawnWeight": 1,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      }
+    ]
+  },
+  {
+    "hordeName": "swarm7",
+    "maximumActiveHordeMembers": 20,
+    "killsRequiredForEasy": 30,
+    "killsRequiredForNormal": 45,
+    "killsRequiredForHard": 60,
+    "bossInfoText": "New Objective: Survive",
+    "bossInfoColor": "white",
+    "findSpawnAttempts": 50,
+    "despawnLeftBehindMembers": true,
+    "mobData": [
+      {
+        "mobID": "minecraft:evoker",
+        "spawnWeight": 2,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      },
+      {
+        "mobID": "minecraft:vindicator",
+        "spawnWeight": 6,
+        "goalPriority": 2,
+        "goalMovementSpeed": 2
+      },
+      {
+        "mobID": "minecraft:pillager",
+        "spawnWeight": 2,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      },
+      {
+        "mobID": "minecraft:witch",
+        "spawnWeight": 3,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      },
+      {
+        "mobID": "minecraft:ravager",
+        "spawnWeight": 2,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1.5
+      }
+    ]
+  },
+  {
+    "hordeName": "swarm8",
+    "maximumActiveHordeMembers": 50,
+    "killsRequiredForEasy": 30,
+    "killsRequiredForNormal": 45,
+    "killsRequiredForHard": 60,
+    "bossInfoText": "chicken dance",
+    "bossInfoColor": "Pink",
+    "findSpawnAttempts": 50,
+    "despawnLeftBehindMembers": true,
+    "mobData": [
+      {
+        "mobID": "minecraft:chicken",
+        "spawnWeight": 1,
+        "goalPriority": 2,
+        "goalMovementSpeed": 1
+      }
+    ]
+  }
+]
