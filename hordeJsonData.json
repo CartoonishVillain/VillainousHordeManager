@@ -67,7 +67,7 @@
     "despawnLeftBehindMembers": true,
     "mobData": [
       {
-        "mobID": "minecraft:phantom",
+        "mobID": "minecraft:creeper",
         "spawnWeight": 1,
         "goalPriority": 2,
         "goalMovementSpeed": 5
