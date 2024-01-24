@@ -10,7 +10,9 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 
 import java.io.FileNotFoundException;
@@ -24,11 +26,18 @@ public class EntityJsonHordeCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("hordeLibrary").then(Commands.literal("reload").requires(cs -> cs.hasPermission(2)).executes(context -> reloadHorde(context.getSource()))));
+
         dispatcher.register(Commands.literal("hordeLibrary").then(Commands.literal("startJsonHorde")
-                        .then(Commands.argument("hordeName", StringArgumentType.string())
+                        .then(Commands.argument("hordeName", StringArgumentType.string()).then(Commands.argument("anchorplayer", EntityArgument.player())
                 .requires(cs -> cs.hasPermission(2))
-                .executes(context -> startHorde(context.getSource(), StringArgumentType.getString(context, "hordeName")))
-        )));
+                .executes(context -> startHorde(context.getSource(), StringArgumentType.getString(context, "hordeName"), EntityArgument.getPlayer(context, "anchorplayer")))
+        ))));
+
+        dispatcher.register(Commands.literal("hordeLibrary").then(Commands.literal("startJsonHorde")
+                .then(Commands.argument("hordeName", StringArgumentType.string())
+                        .requires(cs -> cs.hasPermission(2)).requires(CommandSourceStack::isPlayer)
+                        .executes(context -> startHorde(context.getSource(), StringArgumentType.getString(context, "hordeName")))
+                )));
 
         dispatcher.register(Commands.literal("hordeLibrary").then(Commands.literal("stopJsonHorde")
                 .requires(cs -> cs.hasPermission(2))
@@ -56,6 +65,39 @@ public class EntityJsonHordeCommand {
                         jsonHordeData.getBossInfoText(), jsonHordeData.getBossInfoColor(), jsonHordeData.getHordeName(), jsonHordeData.isDespawnLeftBehindMembers(), hordeMobData);
 
                 VillainousHordeLibrary.jsonHorde.SetUpHorde(Objects.requireNonNull(sourceStack.getPlayer()));
+            } else {
+                //we do not have the horde, list the hordes we have.
+                StringBuilder builder = new StringBuilder();
+                for (String key : VillainousHordeLibrary.gsonHordes.keySet()) {
+                    builder.append(key).append(" ");
+                }
+
+                sourceStack.sendFailure(Component.literal("Horde not found! Available hordes: " + builder));
+            }
+        }
+        return 0;
+    }
+
+    private static int startHorde(CommandSourceStack sourceStack, String hordeName, ServerPlayer player) {
+        if (!sourceStack.getLevel().isClientSide && (VillainousHordeLibrary.jsonHorde == null || !VillainousHordeLibrary.jsonHorde.getHordeActive())) {
+            if (VillainousHordeLibrary.gsonHordes.containsKey(hordeName)) {
+                //we have the horde, load the horde.
+                JsonHordeData jsonHordeData = VillainousHordeLibrary.gsonHordes.get(hordeName);
+                ArrayList<EntityTypeHordeData<?>> hordeMobData = new ArrayList<>();
+                for (JsonMobData data : jsonHordeData.getMobData()) {
+                    Optional<EntityType<?>> type = EntityType.byString(data.getMobID());
+                    if (type.isEmpty()) {
+                        Services.PLATFORM.getLOGGER().warn("VillainousHordeLibrary - Failed to load gson mob of type: " + data.getMobID());
+                        return 0;
+                    }
+                    hordeMobData.add(new EntityTypeHordeData(data.getGoalPriority(), data.getGoalMovementSpeed(), data.getSpawnWeight(), type.get()));
+                }
+
+                VillainousHordeLibrary.jsonHorde = new JsonHorde(sourceStack.getServer(), jsonHordeData.getKillsRequiredForEasy(),
+                        jsonHordeData.getKillsRequiredForNormal(), jsonHordeData.getKillsRequiredForHard(), jsonHordeData.getMaximumActiveHordeMembers(), jsonHordeData.getFindSpawnAttempts(),
+                        jsonHordeData.getBossInfoText(), jsonHordeData.getBossInfoColor(), jsonHordeData.getHordeName(), jsonHordeData.isDespawnLeftBehindMembers(), hordeMobData);
+
+                VillainousHordeLibrary.jsonHorde.SetUpHorde(Objects.requireNonNull(player));
             } else {
                 //we do not have the horde, list the hordes we have.
                 StringBuilder builder = new StringBuilder();
