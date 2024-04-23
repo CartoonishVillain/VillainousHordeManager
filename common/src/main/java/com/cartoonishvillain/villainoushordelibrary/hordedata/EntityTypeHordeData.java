@@ -1,7 +1,9 @@
 package com.cartoonishvillain.villainoushordelibrary.hordedata;
 
+import com.cartoonishvillain.villainoushordelibrary.data.JsonAttributeData;
 import com.cartoonishvillain.villainoushordelibrary.data.JsonEffectData;
 import com.cartoonishvillain.villainoushordelibrary.data.JsonNBTData;
+import com.google.common.collect.Multimap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -14,8 +16,14 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.monster.Zombie;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /*
     Used to store data about horde members in a map. Including spawn weight and goal priority to move towards the center.
@@ -72,6 +80,7 @@ public class EntityTypeHordeData<T extends PathfinderMob> implements HordeData {
     }
 
     public T createInstance(ServerLevel level) {
+        HashMap<Attribute, AttributeModifier> attributeMap = null;
         ArrayList<MobEffectInstance> effectsToAdd = null;
         CompoundTag compoundTag = new CompoundTag();
         compoundTag.putString("id", EntityType.getKey(type).getPath());
@@ -96,16 +105,36 @@ public class EntityTypeHordeData<T extends PathfinderMob> implements HordeData {
                             }
                         }
                     }
-                } else {
+                } else if (tagData.getType().equalsIgnoreCase("attribute")) {
+                    if (tagData.getAttributeData() != null) {
+                        attributeMap = new HashMap<>();
+                        for (JsonAttributeData attributeData : tagData.getAttributeData()) {
+                            Attribute attribute = BuiltInRegistries.ATTRIBUTE.get(new ResourceLocation(attributeData.getAttributeID()));
+                            attributeMap.put(attribute, new AttributeModifier(
+                                    attributeData.getModifierName(), Double.parseDouble(attributeData.getModifierAmount()), AttributeModifier.Operation.fromValue(Integer.parseInt(attributeData.getModifierOperation()))
+                            ));
+                        }
+                    }
+                }
+
+                else {
                     addNBTData(tagData, compoundTag);
                 }
             }
         }
         ArrayList<MobEffectInstance> finalEffectsToAdd = effectsToAdd;
+        HashMap<Attribute, AttributeModifier> finalAttributeMap = attributeMap;
         return (T) EntityType.loadEntityRecursive(compoundTag, level, (entityx) -> {
             if (finalEffectsToAdd != null) {
                 for (MobEffectInstance effectInstance : finalEffectsToAdd) {
                     ((LivingEntity) entityx).addEffect(effectInstance);
+                }
+            }
+
+            if (finalAttributeMap != null) {
+                for (Map.Entry<Attribute, AttributeModifier> modifierEntry : finalAttributeMap.entrySet()) {
+                    AttributeInstance instance = ((LivingEntity) entityx).getAttribute(modifierEntry.getKey());
+                    instance.addTransientModifier(modifierEntry.getValue());
                 }
             }
 

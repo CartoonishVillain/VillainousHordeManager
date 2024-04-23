@@ -24,3 +24,23 @@ There are two ways you can make your own horde events.
 * spawnWeight: the likelihood this mob spawns in a horde, when compared to all other spawn weights in the horde. (Integer)
 * goalPriority: the priority level the "move towards the center player" goal of the horde is in. This may take some tweaking to get right, but for vanilla mobs 2 is *usually* a safe bet. (Integer)
 * goalMovementSpeed: the speed of which mobs try to get to the horde center player. 1 is usually recommended, as this is a speed multiplier, but tinker with it to your heart's content. (Floating point number (Use decimals, if you want.))
+* nbtData: An array of nbt data, the structure of which is below
+
+## Information for horde member NBT data
+* type: The type of data expected from the nbt data, currently the following types are expected: "string", "int", "float", "double", "byte", "boolean", "short". The value for these instances goes in the "value" field later. There is additionally types "effect" and "attribute", with their own special handling
+* key: The key of the nbt data to add, not necessary for "effect" or "attribute" types
+* value: The value of the nbt data to add as a string, not necessary for "effect" or "attribute" types
+* effectData: An array of effect data, the structure of which is below
+* attributeData: An array of attribute data, the structure of which is also below
+
+## Information for horde effect data
+* effect: The effect's resource key, such as `minecraft:speed`
+* duration: The duration of the effect in ticks
+* amplifier: The potency of the effect + 1 level
+* showParticles: Do particles appear?
+
+## Information for horde attribute data
+* attributeID: The attribute's resource key, such as 'minecraft:generic.attack_damage'
+* modifierName: The name of the modifier
+* modifierAmount: How much to modify the value by
+* modifierOperation: The operation to modify the attribute by. 0 is add, 1 is multiply_base, 2 is multiply

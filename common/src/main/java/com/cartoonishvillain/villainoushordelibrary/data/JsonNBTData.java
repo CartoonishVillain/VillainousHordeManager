@@ -8,6 +8,7 @@ public class JsonNBTData implements Serializable {
     String key;
     String value;
     ArrayList<JsonEffectData> effectData;
+    ArrayList<JsonAttributeData> attributeData;
 
     public String getType() {
         return type;
@@ -23,5 +24,9 @@ public class JsonNBTData implements Serializable {
 
     public ArrayList<JsonEffectData> getEffectData() {
         return effectData;
+    }
+
+    public ArrayList<JsonAttributeData> getAttributeData() {
+        return attributeData;
     }
 }

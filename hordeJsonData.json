@@ -14,13 +14,60 @@
         "mobID": "minecraft:zombie",
         "spawnWeight": 3,
         "goalPriority": 2,
-        "goalMovementSpeed": 1
+        "goalMovementSpeed": 1,
+        "nbtData": [
+          {
+            "type": "string",
+            "key": "CustomName",
+            "value": "Dave"
+          },
+          {
+            "type": "attribute",
+            "attributeData": [
+              {
+                "attributeID": "minecraft:generic.attack_damage",
+                "modifierName": "horde modifier 1",
+                "modifierAmount": "100",
+                "modifierOperation": 0
+              }
+            ]
+          }
+        ]
       },
       {
         "mobID": "minecraft:skeleton",
         "spawnWeight": 1,
         "goalPriority": 2,
-        "goalMovementSpeed": 1
+        "goalMovementSpeed": 1,
+        "nbtData": [
+          {
+            "type": "string",
+            "key": "CustomName",
+            "value": "{\"text\":\"Bob\",\"color\":\"blue\"}"
+          },
+          {
+            "type": "effect",
+            "effectData": [
+              {
+                "effect": "minecraft:speed",
+                "duration": "100000",
+                "amplifier": "4",
+                "showParticles": true
+              },
+              {
+                "effect": "minecraft:glowing",
+                "duration": "100000",
+                "amplifier": "0",
+                "showParticles": true
+              }
+            ]
+          },
+          {
+            "type": "float",
+            "key": "Health",
+            "value": "1.0"
+          }
+        ]
       }
     ]
   },
@@ -70,7 +117,14 @@
         "mobID": "minecraft:creeper",
         "spawnWeight": 1,
         "goalPriority": 2,
-        "goalMovementSpeed": 5
+        "goalMovementSpeed": 5,
+        "nbtData": [
+          {
+            "type": "int",
+            "key": "ExplosionRadius",
+            "value": "100"
+          }
+        ]
       }
     ]
   },
