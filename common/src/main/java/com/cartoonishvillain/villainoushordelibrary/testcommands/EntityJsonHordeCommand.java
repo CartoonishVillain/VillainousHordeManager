@@ -57,7 +57,7 @@ public class EntityJsonHordeCommand {
                         Services.PLATFORM.getLOGGER().warn("VillainousHordeLibrary - Failed to load gson mob of type: " + data.getMobID());
                         return 0;
                     }
-                    hordeMobData.add(new EntityTypeHordeData(data.getGoalPriority(), data.getGoalMovementSpeed(), data.getSpawnWeight(), type.get()));
+                    hordeMobData.add(new EntityTypeHordeData(data.getGoalPriority(), data.getGoalMovementSpeed(), data.getSpawnWeight(), type.get(), data.getNbtData()));
                 }
 
                 VillainousHordeLibrary.jsonHorde = new JsonHorde(sourceStack.getServer(), jsonHordeData.getKillsRequiredForEasy(),
@@ -90,7 +90,7 @@ public class EntityJsonHordeCommand {
                         Services.PLATFORM.getLOGGER().warn("VillainousHordeLibrary - Failed to load gson mob of type: " + data.getMobID());
                         return 0;
                     }
-                    hordeMobData.add(new EntityTypeHordeData(data.getGoalPriority(), data.getGoalMovementSpeed(), data.getSpawnWeight(), type.get()));
+                    hordeMobData.add(new EntityTypeHordeData(data.getGoalPriority(), data.getGoalMovementSpeed(), data.getSpawnWeight(), type.get(), data.getNbtData()));
                 }
 
                 VillainousHordeLibrary.jsonHorde = new JsonHorde(sourceStack.getServer(), jsonHordeData.getKillsRequiredForEasy(),
