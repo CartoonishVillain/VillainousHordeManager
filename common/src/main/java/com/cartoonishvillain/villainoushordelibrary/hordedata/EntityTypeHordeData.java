@@ -89,31 +89,12 @@ public class EntityTypeHordeData<T extends PathfinderMob> implements HordeData {
                 if (tagData.getType().equalsIgnoreCase("effect")) {
                     if (tagData.getEffectData() != null) {
                         effectsToAdd = new ArrayList<>();
-                        for (JsonEffectData effectData : tagData.getEffectData()) {
-                            MobEffect effect = BuiltInRegistries.MOB_EFFECT.get(new ResourceLocation(effectData.getEffect()));
-
-                            if (effect != null) {
-                                effectsToAdd.add(
-                                        new MobEffectInstance(
-                                                effect,
-                                                Integer.parseInt(effectData.getDuration()),
-                                                Integer.parseInt(effectData.getAmplifier()),
-                                                effectData.isShowParticles(),
-                                                effectData.isShowParticles()
-                                        )
-                                );
-                            }
-                        }
+                        addEffect(tagData.getEffectData(), effectsToAdd);
                     }
                 } else if (tagData.getType().equalsIgnoreCase("attribute")) {
                     if (tagData.getAttributeData() != null) {
                         attributeMap = new HashMap<>();
-                        for (JsonAttributeData attributeData : tagData.getAttributeData()) {
-                            Attribute attribute = BuiltInRegistries.ATTRIBUTE.get(new ResourceLocation(attributeData.getAttributeID()));
-                            attributeMap.put(attribute, new AttributeModifier(
-                                    attributeData.getModifierName(), Double.parseDouble(attributeData.getModifierAmount()), AttributeModifier.Operation.fromValue(Integer.parseInt(attributeData.getModifierOperation()))
-                            ));
-                        }
+                        addAttributes(tagData.getAttributeData(), attributeMap);
                     }
                 }
 
@@ -161,6 +142,33 @@ public class EntityTypeHordeData<T extends PathfinderMob> implements HordeData {
             default -> {
 
             }
+        }
+    }
+
+    public void addEffect(ArrayList<JsonEffectData> effectDatas, ArrayList<MobEffectInstance> effectInstances) {
+        for (JsonEffectData effectData : effectDatas) {
+            MobEffect effect = BuiltInRegistries.MOB_EFFECT.get(new ResourceLocation(effectData.getEffect()));
+
+            if (effect != null) {
+                effectInstances.add(
+                        new MobEffectInstance(
+                                effect,
+                                Integer.parseInt(effectData.getDuration()),
+                                Integer.parseInt(effectData.getAmplifier()),
+                                effectData.isShowParticles(),
+                                effectData.isShowParticles()
+                        )
+                );
+            }
+        }
+    }
+
+    public void addAttributes(ArrayList<JsonAttributeData> attributeDatas, HashMap<Attribute, AttributeModifier> map) {
+        for (JsonAttributeData attributeData : attributeDatas) {
+            Attribute attribute = BuiltInRegistries.ATTRIBUTE.get(new ResourceLocation(attributeData.getAttributeID()));
+            map.put(attribute, new AttributeModifier(
+                    attributeData.getModifierName(), Double.parseDouble(attributeData.getModifierAmount()), AttributeModifier.Operation.fromValue(Integer.parseInt(attributeData.getModifierOperation()))
+            ));
         }
     }
 }
