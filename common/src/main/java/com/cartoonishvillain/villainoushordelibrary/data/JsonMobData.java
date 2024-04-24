@@ -8,7 +8,7 @@ public class JsonMobData implements Serializable {
     Integer spawnWeight;
     Integer goalPriority;
     Float goalMovementSpeed;
-    ArrayList<JsonNBTData> nbtData;
+    String nbtData;
 
     public String getMobID() {
         return mobID;
@@ -26,7 +26,7 @@ public class JsonMobData implements Serializable {
         return goalMovementSpeed;
     }
 
-    public ArrayList<JsonNBTData> getNbtData() {
+    public String getNbtData() {
         return nbtData;
     }
 }
