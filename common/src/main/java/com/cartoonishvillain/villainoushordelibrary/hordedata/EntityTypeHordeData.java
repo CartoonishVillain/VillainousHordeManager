@@ -71,7 +71,7 @@ public class EntityTypeHordeData<T extends PathfinderMob> implements HordeData {
                 Constants.LOG.error("Horde Manager - Failed to load NBT data for: {}", EntityType.getKey(type).getPath());
             }
         }
-        compoundTag.putString("id", EntityType.getKey(type).getPath());
+        compoundTag.putString("id", EntityType.getKey(type).toString());
 
         return (T) EntityType.loadEntityRecursive(compoundTag, level, (entityx) -> entityx);
     }
