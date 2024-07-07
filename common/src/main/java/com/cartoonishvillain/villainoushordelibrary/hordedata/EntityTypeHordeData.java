@@ -2,23 +2,11 @@ package com.cartoonishvillain.villainoushordelibrary.hordedata;
 
 import com.cartoonishvillain.villainoushordelibrary.Constants;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /*
     Used to store data about horde members in a map. Including spawn weight and goal priority to move towards the center.
