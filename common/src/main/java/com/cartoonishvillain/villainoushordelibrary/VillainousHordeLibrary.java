@@ -5,7 +5,6 @@ import com.cartoonishvillain.villainoushordelibrary.hordes.EntityEnumHorde;
 import com.cartoonishvillain.villainoushordelibrary.hordes.EntityTypeHorde;
 import com.cartoonishvillain.villainoushordelibrary.hordes.JsonHorde;
 import com.cartoonishvillain.villainoushordelibrary.mixin.LivingGoalAccessor;
-import com.cartoonishvillain.villainoushordelibrary.platform.Services;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import net.minecraft.world.entity.PathfinderMob;
