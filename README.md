@@ -3,9 +3,9 @@
 The villainous horde manager (or villainous horde library) is a mod designed to help control horde events.
 
 There are two ways you can make your own horde events.
-* If you have a mod, and would like to directly integrate into the code base for greater control over the horde systems, you can extend the horde classes and follow the examples in the VillainousHordeLibrary file.
+* If you have a mod, and would like to directly integrate into the code base for greater control over the horde systems, you can extend the horde classes and follow the examples in the VillainousHordeManager file.
 * If you want a quick horde setup, you can follow the example set by hordeJsonData.json. Once the json is complete, you only need to place the file in the server/minecraft directory (just outside of the mods folder).
-  * When you do this, you can start your horde with /hordeLibrary startJsonHorde <hordeName>, if you have cheats enabled or operator level 2 permissions.
+  * When you do this, you can start your horde with /hordeManager startJsonHorde <hordeName>, if you have cheats enabled or operator level 2 permissions.
   * The data in this case has precise requirements. If these are not followed, crashes or other assorted weird behavior may occur. Notes will be given per data point.
  
 ### Information points for hordes (most relevant to JSON hordes, but information can be helpful to all):
