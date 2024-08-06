@@ -16,7 +16,7 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "com.cartoonishvillain.villainoushordelibrary.FabricVillainousHordeLibrary"
+            "com.cartoonishvillain.villainoushordemanager.FabricVillainousHordeManager"
         ]
     },
     "mixins": [
