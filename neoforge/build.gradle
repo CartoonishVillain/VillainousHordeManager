@@ -3,6 +3,25 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                url "https://cursemaven.com"
+            }
+        }
+        filter {
+            includeGroup "curse.maven"
+        }
+    }
+}
+
+dependencies {
+    implementation "curse.maven:ars-401955:5995085"
+    implementation "curse.maven:geck-388172:6027599"
+    implementation "curse.maven:curi-1037991:5888964"
+}
+
 neoForge {
     version = neoforge_version
     // Automatically enable neoforge AccessTransformers if the file exists
