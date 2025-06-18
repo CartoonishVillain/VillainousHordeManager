@@ -2,6 +2,8 @@ package com.cartoonishvillain.villainoushordemanager.hordes;
 
 import com.cartoonishvillain.villainoushordemanager.JsonHordeMovementGoal;
 import com.cartoonishvillain.villainoushordemanager.TypeHordeMovementGoal;
+import com.cartoonishvillain.villainoushordemanager.data.JsonMobData;
+import com.cartoonishvillain.villainoushordemanager.data.JsonWaveData;
 import com.cartoonishvillain.villainoushordemanager.hordedata.EntityTypeHordeData;
 import com.cartoonishvillain.villainoushordemanager.mixin.LivingGoalAccessor;
 import com.cartoonishvillain.villainoushordemanager.platform.Services;
@@ -18,7 +20,6 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
-import net.minecraft.world.level.NaturalSpawner;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -28,6 +29,7 @@ public class JsonHorde {
     protected ServerLevel world;
     protected BlockPos center;
     protected Boolean hordeActive = false;
+    protected ArrayList<JsonWaveData> waves;
     protected MinecraftServer server;
     protected int Alive = 0;
     protected int initAlive = 0;
@@ -37,15 +39,16 @@ public class JsonHorde {
     protected ServerPlayer hordeAnchorPlayer;
     protected ArrayList<ServerPlayer> players = new ArrayList<>();
     protected ArrayList<LivingEntity> activeHordeMembers = new ArrayList<>();
-    protected final ServerBossEvent bossInfo;
-    protected ArrayList<EntityTypeHordeData<?>> hordeData;
+    protected ServerBossEvent bossInfo;
+    protected ServerBossEvent oldBossInfo;
+    protected ArrayList<EntityTypeHordeData<?>> hordeData = new ArrayList<>();
     protected String hordeName;
     protected Boolean despawnLeftBehindMembers;
     protected int easyKillCount;
     protected int normalKillCount;
     protected int hardKillCount;
-    protected int spawnAttemptsBeforeCancel;
-    ArrayList<Integer> spawnWeights = new ArrayList<>();
+    protected ArrayList<Integer> spawnWeights = new ArrayList<>();
+    protected int hordeWaveNumber = 0;
 
     /**
      * The enum of reasons why the Horde may end.
@@ -63,25 +66,21 @@ public class JsonHorde {
      */
     public JsonHorde(
             MinecraftServer server,
-            int easyKills,
-            int normalKills,
-            int hardKills,
-            int aliveLimit,
-            int spawnAttempts,
-            String bossText,
-            String color,
-            String hordeName,
-            boolean leftBehindMembersDespawn,
-            ArrayList<EntityTypeHordeData<?>> hordeData
+            ArrayList<JsonWaveData> waves,
+            String hordeName
     ) {
         this.server = server;
-        easyKillCount = easyKills;
-        normalKillCount = normalKills;
-        hardKillCount = hardKills;
-        allowedActive = aliveLimit;
+        this.waves = waves;
         this.hordeName = hordeName;
-        this.hordeData = hordeData;
-        BossEvent.BossBarColor bossColor = switch (color.toLowerCase()) {
+        getDataFromWave(waves.getFirst(), false);
+    }
+
+    private void getDataFromWave(JsonWaveData waveData, Boolean newWave) {
+        easyKillCount = waveData.getKillsRequiredForEasy();
+        normalKillCount = waveData.getKillsRequiredForNormal();
+        hardKillCount = waveData.getKillsRequiredForHard();
+        allowedActive = waveData.getMaximumActiveHordeMembers();
+        BossEvent.BossBarColor bossColor = switch (waveData.getBossInfoColor().toLowerCase()) {
             case "green" -> BossEvent.BossBarColor.GREEN;
             case "blue" -> BossEvent.BossBarColor.BLUE;
             case "pink" -> BossEvent.BossBarColor.PINK;
@@ -91,9 +90,39 @@ public class JsonHorde {
             default -> BossEvent.BossBarColor.WHITE;
         };
 
-        despawnLeftBehindMembers = leftBehindMembersDespawn;
-        bossInfo = new ServerBossEvent(Component.literal(bossText), bossColor, BossEvent.BossBarOverlay.PROGRESS);
-        spawnAttemptsBeforeCancel = spawnAttempts;
+        despawnLeftBehindMembers = waveData.isDespawnLeftBehindMembers();
+        if (bossInfo != null) {
+            oldBossInfo = bossInfo;
+        }
+        bossInfo = new ServerBossEvent(Component.literal(waveData.getBossInfoText()), bossColor, BossEvent.BossBarOverlay.PROGRESS);
+
+        ArrayList<EntityTypeHordeData<?>> entityHordeDataList = new ArrayList<>();
+        for (JsonMobData mobData : waveData.getMobData()) {
+            Optional<EntityType<?>> type = EntityType.byString(mobData.getMobID());
+            if (type.isPresent()) {
+                entityHordeDataList.add(
+                        new EntityTypeHordeData(
+                                mobData.getGoalPriority(),
+                                mobData.getGoalMovementSpeed(),
+                                mobData.getSpawnWeight(),
+                                type.get(),
+                                mobData.getNbtData()
+                        )
+                );
+            } else {
+                Services.PLATFORM.getLOGGER().warn("VillainousHordeManager - Failed to load json mob of type: " + mobData.getMobID());
+            }
+        }
+        setHordeData(entityHordeDataList);
+
+        spawnWeights = new ArrayList<>();
+        for (EntityTypeHordeData<?> hordeEntry : hordeData) {
+            spawnWeights.add(hordeEntry.getSpawnWeight());
+        }
+
+        if (newWave) {
+            SetUpHorde(hordeAnchorPlayer);
+        }
     }
 
 
@@ -155,10 +184,6 @@ public class JsonHorde {
                 setActiveMemberCount();
                 setCenterBlock(serverPlayer.blockPosition());
                 hordeActive = true;
-                spawnWeights = new ArrayList<>();
-                for (EntityTypeHordeData<?> hordeEntry : hordeData) {
-                    spawnWeights.add(hordeEntry.getSpawnWeight());
-                }
             }
         }
     }
@@ -253,6 +278,11 @@ public class JsonHorde {
                         Active = activeHordeMembers.size();
                     }
 
+                    if (oldBossInfo != null) {
+                        oldBossInfo.setVisible(false);
+                        oldBossInfo.removeAllPlayers();
+                        oldBossInfo = null;
+                    }
                     this.bossInfo.setVisible(true);
 
 
@@ -280,7 +310,13 @@ public class JsonHorde {
                     }
                 }
             } else {
-                this.Stop(HordeStopReasons.VICTORY);
+                // if we've somehow surpassed, or are equal to the indexed size of the waves, we declare a victory over the horde
+                if (hordeWaveNumber >= waves.size()-1) {
+                    this.Stop(HordeStopReasons.VICTORY);
+                } else {
+                    hordeWaveNumber += 1; //Otherwise, we increase the wave number, and set the new data
+                    getDataFromWave(waves.get(hordeWaveNumber), true);
+                }
             }
         }
     }
@@ -356,9 +392,9 @@ public class JsonHorde {
     /**
      *   Begins the search for a valid spawnpoint for horde members.
      */
-    protected Optional<BlockPos> getValidSpawn(int var, EntityType<?> type) {
+    protected Optional<BlockPos> getValidSpawn(EntityType<?> type) {
         for (int i = 0; i < 3; ++i) {
-            BlockPos blockPos = this.findRandomSpawnPos(var, type);
+            BlockPos blockPos = this.findRandomSpawnPos(20, type);
             if (blockPos != null) return Optional.of(blockPos);
         }
         return Optional.empty();
@@ -530,7 +566,7 @@ public class JsonHorde {
 
         int attempts = 0;
         while (hordeSpawn.isEmpty()) {
-            hordeSpawn = this.getValidSpawn(spawnAttemptsBeforeCancel, entrySelected.getType());
+            hordeSpawn = this.getValidSpawn(entrySelected.getType());
             attempts++;
             if (hordeSpawn.isEmpty() && attempts >= 5) {
                 this.Stop(HordeStopReasons.SPAWN_ERROR);
@@ -593,9 +629,9 @@ public class JsonHorde {
     /**
         Sets horde entity spawning data.
      */
-    public void setHordeData(EntityTypeHordeData<?>... entityHordeData) {
+    public void setHordeData(ArrayList<EntityTypeHordeData<?>> entityHordeData) {
         this.hordeData.clear();
-        hordeData.addAll(List.of(entityHordeData));
+        hordeData.addAll(entityHordeData);
     }
 
 }

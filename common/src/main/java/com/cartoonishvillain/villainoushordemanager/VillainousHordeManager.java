@@ -14,10 +14,11 @@ import net.minecraft.world.entity.ai.goal.WrappedGoal;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Set;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
 
 // This class is part of the common project meaning it is shared between all supported loaders. Code written here can only
 // import and access the vanilla codebase, libraries used by vanilla, and optionally third party libraries that provide
@@ -37,12 +38,29 @@ public class VillainousHordeManager {
     }
 
     public static void loadHordes() throws FileNotFoundException {
-        JsonReader reader = new JsonReader(new FileReader("hordeJsonData.json"));
-        JsonHordeData[] hordesArray = new Gson().fromJson(reader, JsonHordeData[].class);
-        ArrayList<JsonHordeData> hordesArrayList = new ArrayList<>(Arrays.stream(hordesArray).toList());
-        for (JsonHordeData hordes : hordesArrayList) {
-            gsonHordes.put(hordes.getHordeName(), hordes);
+
+        String dir =System.getProperty("user.dir")+"/config/villainoushordemanager";
+        try{
+            Files.createDirectories(Path.of(dir));
+
+            List<Path> paths = Files.walk(Paths.get(dir),1) //by mentioning max depth as 1 it will only traverse immediate level
+                    .filter(Files::isRegularFile)
+                    .filter(path-> path.getFileName().toString().endsWith(".json")) // fetch only the files which are ending with .JSON
+                    .collect(Collectors.toList());
+            //iterate all the paths and fetch data from corresnponding file
+            for(Path path : paths) {
+                //read the Json File . change here according to your logic
+                JsonReader reader = new JsonReader(new FileReader(path.toFile()));
+                JsonHordeData[] hordesArray = new Gson().fromJson(reader, JsonHordeData[].class);
+                ArrayList<JsonHordeData> hordesArrayList = new ArrayList<>(Arrays.stream(hordesArray).toList());
+                for (JsonHordeData hordes : hordesArrayList) {
+                    gsonHordes.put(hordes.getHordeName(), hordes);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 
     /**

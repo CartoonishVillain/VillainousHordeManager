@@ -3,6 +3,7 @@ package com.cartoonishvillain.villainoushordemanager.testcommands;
 import com.cartoonishvillain.villainoushordemanager.VillainousHordeManager;
 import com.cartoonishvillain.villainoushordemanager.data.JsonHordeData;
 import com.cartoonishvillain.villainoushordemanager.data.JsonMobData;
+import com.cartoonishvillain.villainoushordemanager.data.JsonWaveData;
 import com.cartoonishvillain.villainoushordemanager.hordedata.EntityTypeHordeData;
 import com.cartoonishvillain.villainoushordemanager.hordes.JsonHorde;
 import com.cartoonishvillain.villainoushordemanager.platform.Services;
@@ -16,9 +17,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static com.cartoonishvillain.villainoushordemanager.VillainousHordeManager.loadHordes;
 
@@ -50,19 +49,21 @@ public class EntityJsonHordeCommand {
             if (VillainousHordeManager.gsonHordes.containsKey(hordeName)) {
                 //we have the horde, load the horde.
                 JsonHordeData jsonHordeData = VillainousHordeManager.gsonHordes.get(hordeName);
-                ArrayList<EntityTypeHordeData<?>> hordeMobData = new ArrayList<>();
-                for (JsonMobData data : jsonHordeData.getMobData()) {
-                    Optional<EntityType<?>> type = EntityType.byString(data.getMobID());
-                    if (type.isEmpty()) {
-                        Services.PLATFORM.getLOGGER().warn("VillainousHordeManager - Failed to load gson mob of type: " + data.getMobID());
-                        return 0;
+                Map<String, ArrayList<EntityTypeHordeData<?>>> waveHordeMobData = new HashMap<>();
+                for (JsonWaveData wave : jsonHordeData.getWaves()) {
+                    ArrayList<EntityTypeHordeData<?>> hordeMobData = new ArrayList<>();
+                    for (JsonMobData data : wave.getMobData()) {
+                        Optional<EntityType<?>> type = EntityType.byString(data.getMobID());
+                        if (type.isEmpty()) {
+                            Services.PLATFORM.getLOGGER().warn("VillainousHordeManager - Failed to load gson mob of type: " + data.getMobID());
+                            return 0;
+                        }
+                        hordeMobData.add(new EntityTypeHordeData(data.getGoalPriority(), data.getGoalMovementSpeed(), data.getSpawnWeight(), type.get(), data.getNbtData()));
                     }
-                    hordeMobData.add(new EntityTypeHordeData(data.getGoalPriority(), data.getGoalMovementSpeed(), data.getSpawnWeight(), type.get(), data.getNbtData()));
+                    waveHordeMobData.put(wave.getWaveName(), hordeMobData);
                 }
 
-                VillainousHordeManager.jsonHorde = new JsonHorde(sourceStack.getServer(), jsonHordeData.getKillsRequiredForEasy(),
-                        jsonHordeData.getKillsRequiredForNormal(), jsonHordeData.getKillsRequiredForHard(), jsonHordeData.getMaximumActiveHordeMembers(), jsonHordeData.getFindSpawnAttempts(),
-                        jsonHordeData.getBossInfoText(), jsonHordeData.getBossInfoColor(), jsonHordeData.getHordeName(), jsonHordeData.isDespawnLeftBehindMembers(), hordeMobData);
+                VillainousHordeManager.jsonHorde = new JsonHorde(sourceStack.getServer(), jsonHordeData.getWaves(), jsonHordeData.getHordeName());
 
                 VillainousHordeManager.jsonHorde.SetUpHorde(Objects.requireNonNull(sourceStack.getPlayer()));
             } else {
@@ -83,19 +84,21 @@ public class EntityJsonHordeCommand {
             if (VillainousHordeManager.gsonHordes.containsKey(hordeName)) {
                 //we have the horde, load the horde.
                 JsonHordeData jsonHordeData = VillainousHordeManager.gsonHordes.get(hordeName);
-                ArrayList<EntityTypeHordeData<?>> hordeMobData = new ArrayList<>();
-                for (JsonMobData data : jsonHordeData.getMobData()) {
-                    Optional<EntityType<?>> type = EntityType.byString(data.getMobID());
-                    if (type.isEmpty()) {
-                        Services.PLATFORM.getLOGGER().warn("VillainousHordeManager - Failed to load gson mob of type: " + data.getMobID());
-                        return 0;
+                Map<String, ArrayList<EntityTypeHordeData<?>>> waveHordeMobData = new HashMap<>();
+                for (JsonWaveData wave : jsonHordeData.getWaves()) {
+                    ArrayList<EntityTypeHordeData<?>> hordeMobData = new ArrayList<>();
+                    for (JsonMobData data : wave.getMobData()) {
+                        Optional<EntityType<?>> type = EntityType.byString(data.getMobID());
+                        if (type.isEmpty()) {
+                            Services.PLATFORM.getLOGGER().warn("VillainousHordeManager - Failed to load gson mob of type: " + data.getMobID());
+                            return 0;
+                        }
+                        hordeMobData.add(new EntityTypeHordeData(data.getGoalPriority(), data.getGoalMovementSpeed(), data.getSpawnWeight(), type.get(), data.getNbtData()));
                     }
-                    hordeMobData.add(new EntityTypeHordeData(data.getGoalPriority(), data.getGoalMovementSpeed(), data.getSpawnWeight(), type.get(), data.getNbtData()));
+                    waveHordeMobData.put(wave.getWaveName(), hordeMobData);
                 }
 
-                VillainousHordeManager.jsonHorde = new JsonHorde(sourceStack.getServer(), jsonHordeData.getKillsRequiredForEasy(),
-                        jsonHordeData.getKillsRequiredForNormal(), jsonHordeData.getKillsRequiredForHard(), jsonHordeData.getMaximumActiveHordeMembers(), jsonHordeData.getFindSpawnAttempts(),
-                        jsonHordeData.getBossInfoText(), jsonHordeData.getBossInfoColor(), jsonHordeData.getHordeName(), jsonHordeData.isDespawnLeftBehindMembers(), hordeMobData);
+                VillainousHordeManager.jsonHorde = new JsonHorde(sourceStack.getServer(), jsonHordeData.getWaves(), jsonHordeData.getHordeName());
 
                 VillainousHordeManager.jsonHorde.SetUpHorde(Objects.requireNonNull(player));
             } else {
