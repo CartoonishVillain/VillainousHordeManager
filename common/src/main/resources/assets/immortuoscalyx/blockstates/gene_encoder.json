@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "immortuoscalyx:block/gene_encoder",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "immortuoscalyx:block/gene_encoder",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "immortuoscalyx:block/gene_encoder"
+    },
+    "facing=west": {
+      "model": "immortuoscalyx:block/gene_encoder",
+      "y": 90
+    }
+  }
+}

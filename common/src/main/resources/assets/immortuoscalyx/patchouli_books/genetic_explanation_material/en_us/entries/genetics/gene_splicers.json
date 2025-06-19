@@ -1,0 +1,19 @@
+{
+  "name": "Gene Splicer Implants",
+  "icon": "immortuoscalyx:gene_splicer",
+  "category": "immortuoscalyx:genetics",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortuoscalyx:gene_splicer",
+      "title": "Gene Splicing",
+      "text": "The Gene Splicer is an implant for humanoids, allowing you to take your identified gene vials, and implant them into your own body, giving you benefits based on which genes are implanted. Removing gene implants will harm the user, and gene vials are not reusable, so please be sure you're ready to commit to the genes you select."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortuoscalyx:advanced_gene_splicer",
+      "text": "The Advanced Gene Splicer is once again patented by Rusk Co. We can not give you the recipe to make it at this time. However, one of our staff members may be able to offer it in a trade. It allows for two Gene vials to be implanted, instead of the regular one."
+    }
+  ]
+}

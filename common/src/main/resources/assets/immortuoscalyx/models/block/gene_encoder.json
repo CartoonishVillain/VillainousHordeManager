@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "immortuoscalyx:block/gene_encoder_side",
+    "east": "immortuoscalyx:block/gene_encoder_side",
+    "north": "immortuoscalyx:block/gene_encoder_side",
+    "particle": "immortuoscalyx:block/gene_encoder_side",
+    "south": "immortuoscalyx:block/gene_encoder_side",
+    "up": "immortuoscalyx:block/gene_encoder_top",
+    "west": "immortuoscalyx:block/gene_encoder_side"
+  }
+}

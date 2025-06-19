@@ -1,0 +1,21 @@
+{
+  "name": "pspspspspspspsps",
+  "icon": "immortuoscalyx:unidentified_gene",
+  "category": "immortuoscalyx:genetics",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:image",
+      "images": [
+        "immortuoscalyx:textures/gui/lab_image.png"
+      ],
+      "border": true,
+      "title": "git here!!",
+      "text": "wen u ask \"wut is dis strong?? :o\", com her!!"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "gu uppies n us R string maker. bring honyconb. make u be like \"know dis strong :o\"! als mak betr helicks n strongs!! en vilage! lok fur funy blu glass!"
+    }
+  ]
+}

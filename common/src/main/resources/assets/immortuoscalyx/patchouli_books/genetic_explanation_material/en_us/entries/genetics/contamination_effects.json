@@ -1,0 +1,53 @@
+{
+  "name": "Contamination Effects",
+  "icon": "immortuoscalyx:identified_gene",
+  "category": "immortuoscalyx:genetics",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Contamination Effects",
+      "text": "So you've contaminated your sample. What hardships would await you if you choose to equip the gene vial anyway? This entry will list the details on the 5 contamination types we know of today. Rusk Co. does not condone the usage of contaminated genes."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Heliophobia",
+      "text": "The user's skin will form clear, crystalline structures, magnifying the Sun's rays and igniting victims exposed to it without any cooling."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Hydrophobia",
+      "text": "Makes large quantities of water toxic to the victim. Smaller quantities should still be consumed regularly to maintain relative health."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Genetic Destabilization",
+      "text": "The Genes across the body are rewired in strange and inefficient ways, occasionally causing overheating to the point of spontaneous combustion."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Stagger",
+      "text": "Forcibly lowers the guard of the victim by always having them ever so slightly off balance, increasing any damage taken."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Knee Pastafication",
+      "text": "Makes the victim's knees prone to being unstable, especially under heavy loads. The victim will be unable to move conventionally for a few seconds upon taking fall damage."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Giant",
+      "text": "Makes the victim rapidly grow in size. Their reach will grow to compensate, but no other physical statistics will increase as one may usually expect from becoming giant."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Glass Bones",
+      "text": "Enzymes produced by the gene crystallize the calcium in the victim's bones into a glass-like substance, reducing their maximum health."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Shady",
+      "text": "This gene will make the victim give off bad vibes that villagers don't appreciate."
+    }
+  ]
+}

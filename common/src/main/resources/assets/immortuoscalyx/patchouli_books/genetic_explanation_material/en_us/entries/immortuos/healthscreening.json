@@ -1,0 +1,20 @@
+{
+  "name": "Health Screening",
+  "icon": "immortuoscalyx:health_scanner",
+  "category": "immortuoscalyx:immortuos",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortuoscalyx:infection_scanner",
+      "title": "Infection Scanner",
+      "text": "A scanner block. It scans the user standing on it for the Immortuos Calyx parasite. If the user is infected, a negative tone will play and this scanner will produce a redstone signal. If not, a positive tone will play and the redstone signal will not be produced."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortuoscalyx:health_scanner",
+      "title": "Health Scanner",
+      "text": "A portable health scanner, gives information on the infection rate of individuals where applicable, as well as other health based stats."
+    }
+  ]
+}

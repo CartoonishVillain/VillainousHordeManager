@@ -5,6 +5,7 @@ import com.cartoonishvillain.villainoushordemanager.hordes.EntityEnumHorde;
 import com.cartoonishvillain.villainoushordemanager.hordes.EntityTypeHorde;
 import com.cartoonishvillain.villainoushordemanager.hordes.JsonHorde;
 import com.cartoonishvillain.villainoushordemanager.mixin.LivingGoalAccessor;
+import com.cartoonishvillain.villainoushordemanager.platform.Services;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import net.minecraft.world.entity.PathfinderMob;
@@ -12,12 +13,15 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 // This class is part of the common project meaning it is shared between all supported loaders. Code written here can only
@@ -37,30 +41,41 @@ public class VillainousHordeManager {
     public static void init() {
     }
 
-    public static void loadHordes() throws FileNotFoundException {
+    public static int loadHordes() {
+        int failures = 0;
+        String dir = System.getProperty("user.dir")+"/config/villainoushordemanager";
+        ArrayList<Path> paths = new ArrayList<>();
 
-        String dir =System.getProperty("user.dir")+"/config/villainoushordemanager";
-        try{
+        try {
             Files.createDirectories(Path.of(dir));
 
-            List<Path> paths = Files.walk(Paths.get(dir),1) //by mentioning max depth as 1 it will only traverse immediate level
+             paths.addAll(Files.walk(Paths.get(dir), 1) //by mentioning max depth as 1 it will only traverse immediate level
                     .filter(Files::isRegularFile)
-                    .filter(path-> path.getFileName().toString().endsWith(".json")) // fetch only the files which are ending with .JSON
-                    .collect(Collectors.toList());
-            //iterate all the paths and fetch data from corresnponding file
-            for(Path path : paths) {
-                //read the Json File . change here according to your logic
+                    .filter(path -> path.getFileName().toString().endsWith(".json")) // fetch only the files which are ending with .JSON
+                    .collect(Collectors.toList()));
+        } catch (IOException e) {
+            failures = -1;
+            Services.PLATFORM.getLOGGER().error("VillainousHordeManager - Failed to grab json horde data: ");
+            e.printStackTrace();
+        }
+
+        //iterate all the paths and fetch data from corresnponding file
+        for(Path path : paths) {
+            //read the Json File . change here according to your logic
+            try {
                 JsonReader reader = new JsonReader(new FileReader(path.toFile()));
                 JsonHordeData[] hordesArray = new Gson().fromJson(reader, JsonHordeData[].class);
                 ArrayList<JsonHordeData> hordesArrayList = new ArrayList<>(Arrays.stream(hordesArray).toList());
                 for (JsonHordeData hordes : hordesArrayList) {
                     gsonHordes.put(hordes.getHordeName(), hordes);
                 }
+            } catch (Exception e) {
+                failures++;
+                Services.PLATFORM.getLOGGER().warn("VillainousHordeManager - Failed to load file: " + path.getFileName());
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-
+        return failures;
     }
 
     /**

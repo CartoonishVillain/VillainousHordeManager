@@ -1,0 +1,19 @@
+{
+  "name": "yarn rolls",
+  "icon": "immortuoscalyx:gene_splicer",
+  "category": "immortuoscalyx:genetics",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortuoscalyx:gene_splicer",
+      "title": "yarn roll",
+      "text": "yarn roll alow kitteh tu wear strong!!!! helicks es unusble aftr tho :c"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortuoscalyx:advanced_gene_splicer",
+      "text": "teh many yarn rollr allws too strongs!! waow. no cn craf kitteh, mus us funneh gren rock wih squid peopl"
+    }
+  ]
+}

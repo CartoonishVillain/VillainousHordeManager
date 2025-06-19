@@ -3,7 +3,6 @@ package com.cartoonishvillain.villainoushordemanager.platform;
 import com.cartoonishvillain.villainoushordemanager.FabricVillainousHordeManager;
 import com.cartoonishvillain.villainoushordemanager.platform.services.IPlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.MobSpawnType;

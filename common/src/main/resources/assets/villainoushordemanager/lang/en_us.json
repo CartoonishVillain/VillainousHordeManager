@@ -1,0 +1,5 @@
+{
+  "villainoushordemanager.reload.success": "Reload successful, no errors detected with formatting.",
+  "villainoushordemanager.reload.success.partial": "Reload partially successful, %1$s error(s) in formatting found while loading. Review logs for more details.",
+  "villainoushordemanager.reload.failure": "Reload failed. Please review the logs and report/fix any issues accordingly."
+}

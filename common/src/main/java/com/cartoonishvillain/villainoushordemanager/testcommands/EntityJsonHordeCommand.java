@@ -16,7 +16,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 
-import java.io.FileNotFoundException;
 import java.util.*;
 
 import static com.cartoonishvillain.villainoushordemanager.VillainousHordeManager.loadHordes;
@@ -55,7 +54,7 @@ public class EntityJsonHordeCommand {
                     for (JsonMobData data : wave.getMobData()) {
                         Optional<EntityType<?>> type = EntityType.byString(data.getMobID());
                         if (type.isEmpty()) {
-                            Services.PLATFORM.getLOGGER().warn("VillainousHordeManager - Failed to load gson mob of type: " + data.getMobID());
+                            Services.PLATFORM.getLOGGER().warn("VillainousHordeManager - Failed to load json mob of type: " + data.getMobID());
                             return 0;
                         }
                         hordeMobData.add(new EntityTypeHordeData(data.getGoalPriority(), data.getGoalMovementSpeed(), data.getSpawnWeight(), type.get(), data.getNbtData()));
@@ -90,7 +89,7 @@ public class EntityJsonHordeCommand {
                     for (JsonMobData data : wave.getMobData()) {
                         Optional<EntityType<?>> type = EntityType.byString(data.getMobID());
                         if (type.isEmpty()) {
-                            Services.PLATFORM.getLOGGER().warn("VillainousHordeManager - Failed to load gson mob of type: " + data.getMobID());
+                            Services.PLATFORM.getLOGGER().warn("VillainousHordeManager - Failed to load json mob of type: " + data.getMobID());
                             return 0;
                         }
                         hordeMobData.add(new EntityTypeHordeData(data.getGoalPriority(), data.getGoalMovementSpeed(), data.getSpawnWeight(), type.get(), data.getNbtData()));
@@ -123,13 +122,15 @@ public class EntityJsonHordeCommand {
     private static int reloadHorde(CommandSourceStack sourceStack) {
         VillainousHordeManager.gsonHordes.clear();
 
-        try {
-            loadHordes();
-        } catch (FileNotFoundException e) {
-            Services.PLATFORM.getLOGGER().warn("VillainousHordeManager - hordeJsonData.json not found! No Json hordes are loaded!");
-        }
+        int failures = loadHordes();
 
-        sourceStack.sendSuccess(() -> Component.literal("Reload attempted."), true);
+        if (failures == 0) {
+            sourceStack.sendSuccess(() -> Component.translatable("villainoushordemanager.reload.success"), true);
+        } else if (failures == -1) {
+            sourceStack.sendFailure(Component.translatable("villainoushordemanager.reload.failure"));
+        } else {
+            sourceStack.sendSuccess(() -> Component.translatable("villainoushordemanager.reload.success.partial", failures), true);
+        }
         return 0;
     }
 }

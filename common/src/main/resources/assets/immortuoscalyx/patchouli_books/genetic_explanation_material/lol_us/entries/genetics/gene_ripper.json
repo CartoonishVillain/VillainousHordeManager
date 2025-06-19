@@ -1,0 +1,14 @@
+{
+  "name": "strng takr",
+  "icon": "immortuoscalyx:gene_ripper",
+  "category": "immortuoscalyx:genetics",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortuoscalyx:gene_ripper",
+      "title": "strng takr",
+      "text": "hold en paw tu sometim get unknon strong wen kil!!!"
+    }
+  ]
+}

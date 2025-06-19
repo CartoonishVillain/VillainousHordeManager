@@ -1,0 +1,5 @@
+{
+  "variants": { 
+    "": { "model": "immortuoscalyx:block/infection_scanner" }
+  }
+}

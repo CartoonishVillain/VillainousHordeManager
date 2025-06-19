@@ -1,0 +1,53 @@
+{
+  "name": "heckin issues",
+  "icon": "immortuoscalyx:identified_gene",
+  "category": "immortuoscalyx:genetics",
+  "sortnum": 6,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "heckin issues",
+      "text": "u heked teh strong, her es issus. do nawt us thes kthnx"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "sun spooooky :c",
+      "text": "teh sun!! owie!!! *hiss*"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "*hiss* watr",
+      "text": "kitteh no liek bath time D:"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "oooo suden fire",
+      "text": "hop u hav gud smors"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "dizy",
+      "text": "wha heck?? owie!!!"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "steppies weak",
+      "text": "i fel.. tim fur cat napp..."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "beeeg",
+      "text": "mak kitteh beeeg :o"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "noisE bons",
+      "text": "bons r crumchy n hurt mor"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "spoopy",
+      "text": "maks kitteh spoopy. vilagur no liek"
+    }
+  ]
+}

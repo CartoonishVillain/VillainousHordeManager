@@ -23,7 +23,10 @@ import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 
 public class JsonHorde {
     protected ServerLevel world;

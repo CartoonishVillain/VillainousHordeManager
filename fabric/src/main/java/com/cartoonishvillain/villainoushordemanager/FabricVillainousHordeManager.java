@@ -19,9 +19,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import org.slf4j.Logger;
-
-import java.io.FileNotFoundException;
-
 import static com.cartoonishvillain.villainoushordemanager.VillainousHordeManager.jsonHorde;
 import static com.cartoonishvillain.villainoushordemanager.VillainousHordeManager.loadHordes;
 import static net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTED;
@@ -80,17 +77,7 @@ public class FabricVillainousHordeManager implements ModInitializer {
                 );
             }
 
-            try {
-                loadHordes();
-            } catch (FileNotFoundException e) {
-                LOGGER.warn("VillainousHordeManager - hordeJsonData.json not found! No Json hordes are loaded!");
-            } catch (IllegalStateException e) {
-                LOGGER.error("VillainousHordeManager - hordeJsonData.json malformed. No Json hordes loaded.");
-                e.printStackTrace();
-            } catch (JsonSyntaxException e) {
-                LOGGER.error("VillainousHordeManager - hordeJsonData.json malformed. No Json hordes loaded.");
-                e.printStackTrace();
-            }
+            loadHordes();
         }
     }
 

@@ -1,0 +1,17 @@
+{
+  "name": "Symptoms",
+  "icon": "immortuoscalyx:immortuos_sample",
+  "category": "immortuoscalyx:immortuos",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Symptoms",
+      "text": "The first symptoms a patient will notice is a slowly developing sore throat, followed by a fever. After reproducing in the body, the parasite will attack and make a home in the vocal cords, reducing the ability for the patient to communicate. After a while longer, the patient becomes contagious, and risks spreading the infection upon contact if they grow violent."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "As the quantity of parasites grow, the user will begin to adapt to its way of life, being able to breathe under water safely, and becoming faster in cold environments, and slower in warm ones. This is followed by strengthening and weakening the patient in cold or warm environments. At this point, if the patient isn't treated soon, the parasite will attack the user's eyes, blinding the user, before ultimately consuming them, and puppeteering their body."
+    }
+  ]
+}

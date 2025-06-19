@@ -1,0 +1,20 @@
+{
+  "name": "Helf loking",
+  "icon": "immortuoscalyx:health_scanner",
+  "category": "immortuoscalyx:immortuos",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortuoscalyx:infection_scanner",
+      "title": "bleh lookr",
+      "text": "blok tha loks et kitteh standin on et fir bleh. if kitteh haz bleh, angy beeper n powr radston. if kitteh no bleh, hapy beppr n nu pwr radstony"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortuoscalyx:health_scanner",
+      "title": "helth lookr",
+      "text": "helth lokr en paw, les u no abt kitteh's helth, ur own n othrs!!"
+    }
+  ]
+}

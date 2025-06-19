@@ -1,0 +1,32 @@
+{
+  "name": "Syringes",
+  "icon": "immortuoscalyx:syringe",
+  "category": "immortuoscalyx:immortuos",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortuoscalyx:syringe",
+      "title": "Syringes",
+      "text": "Syringes are used to contain samples of, and medicines against, the Immortuos Calyx Parasite"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortuoscalyx:anti_parasitic",
+      "title": "General Anti Parasitic",
+      "text": "General Anti Parasitic will raise the body's natural immune response to the initial infection of Immortuos Calyx, potentially negating it if the dose was recent enough, though this isn't a guarantee. It also can be used to kill the some of the parasites actively in the blood stream, if the infection hasn't progressed far. But it also is indiscriminate in what it attacks, causing organ damage."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortuoscalyx:calyxanide",
+      "title": "Calyxanide",
+      "text": "In truth, this is a weakened version of Calyxanide. The original version is too expensive and complicated to make. But, applying this should kill a large portion of the parasites in a host, even in later stages. If the parasite has heavily integrated with the patient, they may suffer horrific damage."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortuoscalyx:immortuos_sample",
+      "title": "Immortuos Sample",
+      "text": "A contained sample of the Immortuos Calyx Parasite. Only really useful for infecting others, or yourself. Why would you do that?"
+    }
+  ]
+}

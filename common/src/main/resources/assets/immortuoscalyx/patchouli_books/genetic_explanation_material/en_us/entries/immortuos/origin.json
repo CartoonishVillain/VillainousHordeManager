@@ -1,0 +1,17 @@
+{
+  "name": "The Origin",
+  "icon": "immortuoscalyx:immortuos_eggs",
+  "category": "immortuoscalyx:immortuos",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Incident Report",
+      "text": "Immortuos Calyx is a parasite. The first infection occurred after a dive team went to investigate and excavate under water ruins in a deep cold ocean. Since then, the Parasite has occasionally threatened our day to day life."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Infected individuals can pass the parasite to users directly from skin to skin contact. Consuming or injecting samples will also most likely infect the user. Wearing armor could reduce the rate of infection, as well as dosing up ahead of time on General Anti Parasitic."
+    }
+  ]
+}

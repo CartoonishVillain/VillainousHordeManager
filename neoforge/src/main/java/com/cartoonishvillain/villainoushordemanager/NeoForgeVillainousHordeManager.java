@@ -24,8 +24,6 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.slf4j.Logger;
 
-import java.io.FileNotFoundException;
-
 import static com.cartoonishvillain.villainoushordemanager.VillainousHordeManager.*;
 
 @Mod(Constants.MOD_ID)
@@ -59,11 +57,7 @@ public class NeoForgeVillainousHordeManager {
             );
         }
 
-        try {
-            loadHordes();
-        } catch (FileNotFoundException e) {
-            LOGGER.warn("VillainousHordeManager - hordeJsonData.json not found! No Json hordes are loaded!");
-        }
+        loadHordes();
     }
 
     @SubscribeEvent

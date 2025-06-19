@@ -1,0 +1,29 @@
+{
+  "name": "string maker",
+  "icon": "immortuoscalyx:gene_encoder",
+  "category": "immortuoscalyx:genetics",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortuoscalyx:gene_encoder",
+      "title": "string maker",
+      "text": "can mak strong or figur owt strong her :o vry cool! her is ur opshions on naxt pages"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "figur out",
+      "text": "wit honyconb n unknow strong, us string makr to know strong!!!"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "strong stronger!!!",
+      "text": "us strong wit strong of sam typ n combin quelity fur moar stonk!! maaaay heck tho D:"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "strong combonationing",
+      "text": "puut tu strong togetter tu fit moar strong. also maaay heck tho D:"
+    }
+  ]
+}

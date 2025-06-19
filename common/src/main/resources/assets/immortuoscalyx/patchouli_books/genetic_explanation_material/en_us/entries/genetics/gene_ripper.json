@@ -1,0 +1,14 @@
+{
+  "name": "Gene Ripper",
+  "icon": "immortuoscalyx:gene_ripper",
+  "category": "immortuoscalyx:genetics",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortuoscalyx:gene_ripper",
+      "title": "The Gene Ripper",
+      "text": "The first thing you'll need for Genetics research is the Gene Ripper. Killing entities with this in hand provides a low (~5%) chance to harvest genetic material."
+    }
+  ]
+}

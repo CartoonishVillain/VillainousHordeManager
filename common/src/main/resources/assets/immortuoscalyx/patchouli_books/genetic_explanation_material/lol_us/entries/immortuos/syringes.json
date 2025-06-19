@@ -1,0 +1,32 @@
+{
+  "name": "sCARY POINTYs",
+  "icon": "immortuoscalyx:syringe",
+  "category": "immortuoscalyx:immortuos",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortuoscalyx:syringe",
+      "title": "sCARY POINTY",
+      "text": "sCARY!!! POINTY!!! HECK!!! cn haz yucky medicane or bleh sampl"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortuoscalyx:anti_parasitic",
+      "title": "vitimn see",
+      "text": "tast like ornge. bu also makes tummy hurt!!! D:. maks les bleh ef not supr bleh"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortuoscalyx:calyxanide",
+      "title": "gud no bleh juic",
+      "text": "hekin gud et makin less bleh, bu ouchi if ver vry bleh D:"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "immortuoscalyx:immortuos_sample",
+      "title": "bleh juic",
+      "text": "juic tha mek u or othr kitter bleh. y u do dis?"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Visit Our Labs",
+  "icon": "immortuoscalyx:unidentified_gene",
+  "category": "immortuoscalyx:genetics",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:image",
+      "images": [
+        "immortuoscalyx:textures/gui/lab_image.png"
+      ],
+      "border": true,
+      "title": "Wish you were here!",
+      "text": "Once you gathered some unidentified genetic material, come find us!"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Our staff will happily allow you to go upstairs, allowing you buy materials, and research the genes you have collect. Be sure to bring honey combs for the research, you'll need them! Our buildings generally look the same across every biome - look for the big blue beaker!"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "name": "Gene Encoders",
+  "icon": "immortuoscalyx:gene_encoder",
+  "category": "immortuoscalyx:genetics",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "immortuoscalyx:gene_encoder",
+      "title": "Gene Encoding",
+      "text": "The Gene Encoder is a revolutionary device patented by Rusk Co. We won't be at this time informing the public on how to make this device, but you are free to come into our lab and use it for yourself. In the next few pages, we will go over every operation of the Gene Encoder. Rusk Co. bares no responsibility for any harm caused by misuse of this device."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Gene Identification",
+      "text": "With an Unidentified Gene in one hand, and a Honey Comb in the other, the Gene Encoder will clean up the genetic strands and automatically label the gene provided, as well as reporting the quality of the gene. Gene quality effects the potency of the gene when implanted into a humanoid. Once a gene is identified, it is usable with a Gene Splicer implant, but you can get more potent effects with additional operations."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Genetic Refining",
+      "text": "Using the Genetic Encoder with a copy of the same gene in both hands will combine the two genes together, adding their quality together, and returning one gene vial with the sum of the quality. There is a low (~5%) chance that while doing this operation, the gene will be contaminated. Contaminated genes can not be refined or combined."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Genetic Combining",
+      "text": "Using the genetic encoder with genes of different types in each hand will combine both genes into the same vial, taking the median of their quality. This allows you to fit more genes into one modification. There is a considerable (~12%) chance that while doing this operation, the gene will be contaminated. Neither Combined nor Contaminated genes can be refined or combined."
+    }
+  ]
+}

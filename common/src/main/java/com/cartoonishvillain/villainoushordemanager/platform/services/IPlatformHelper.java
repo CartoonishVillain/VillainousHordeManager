@@ -1,11 +1,10 @@
 package com.cartoonishvillain.villainoushordemanager.platform.services;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
-import net.minecraft.world.entity.MobSpawnType;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
