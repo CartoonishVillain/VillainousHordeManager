@@ -41,14 +41,14 @@ public class NeoForgeVillainousHordeManager {
     {
         if (Services.PLATFORM.isDevelopmentEnvironment()) {
             //Step 1 - Instantiate
-            VillainousHordeManager.entityTypeHorde = new EntityTypeHorde(event.getServer());
+//            VillainousHordeManager.entityTypeHorde = new EntityTypeHorde(event.getServer());
             VillainousHordeManager.entityEnumHorde = new TestEnumHorde(event.getServer());
             //This horde will consist of spiders, evokers, and creepers. Roughly equal quantities, but this is psuedo-randomized, so results may vary.
-            VillainousHordeManager.entityTypeHorde.setHordeData(
-                    new EntityTypeHordeData<>(2, 1, 1, EntityType.SPIDER),
-                    new EntityTypeHordeData<>(2, 1, 1, EntityType.EVOKER),
-                    new EntityTypeHordeData<>(2, 1, 1, EntityType.CREEPER)
-            );
+//            VillainousHordeManager.entityTypeHorde.setHordeData(
+//                    new EntityTypeHordeData<>(2, 1, 1, EntityType.SPIDER),
+//                    new EntityTypeHordeData<>(2, 1, 1, EntityType.EVOKER),
+//                    new EntityTypeHordeData<>(2, 1, 1, EntityType.CREEPER)
+//            );
             //This enum horde will consist of creepers, spiders, and vindicators in the overworld, and zombies, evokers, and skeletons in the nether.
             VillainousHordeManager.entityEnumHorde.setHordeData(
                     new EnumHordeData(2, 1, 1, TestHordeDataClass.CREEPEROVERZOMBIENETHER),

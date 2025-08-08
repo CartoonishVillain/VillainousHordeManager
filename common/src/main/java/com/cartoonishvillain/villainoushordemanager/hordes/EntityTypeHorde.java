@@ -1,6 +1,8 @@
 package com.cartoonishvillain.villainoushordemanager.hordes;
 
 import com.cartoonishvillain.villainoushordemanager.TypeHordeMovementGoal;
+import com.cartoonishvillain.villainoushordemanager.data.EntityTypeWaveData;
+import com.cartoonishvillain.villainoushordemanager.data.json.JsonWaveData;
 import com.cartoonishvillain.villainoushordemanager.hordedata.EntityTypeHordeData;
 import com.cartoonishvillain.villainoushordemanager.mixin.LivingGoalAccessor;
 import com.cartoonishvillain.villainoushordemanager.platform.Services;
@@ -22,11 +24,19 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.*;
 
-public class EntityTypeHorde {
+/**
+ * This class is no longer going to be updated, aside to update any core procedures (new methods that should be used, general horde documentation)
+ * In the event that a compile error occurs, code will be commented out from this class instead of attempting to keep it alive.
+ * You may extend this class and make hordes to your hearts content still. But we will not be testing or further adding logic to this class.
+ */
+@Deprecated
+public abstract class EntityTypeHorde {
     protected ServerLevel world;
     protected BlockPos center;
     protected Boolean hordeActive = false;
     protected MinecraftServer server;
+    protected ArrayList<EntityTypeWaveData> waves;
+    protected int hordeWaveNumber = 0;
     protected int Alive = 0;
     protected int initAlive = 0;
     protected int Active = 0;
@@ -35,7 +45,7 @@ public class EntityTypeHorde {
     protected ServerPlayer hordeAnchorPlayer;
     protected ArrayList<ServerPlayer> players = new ArrayList<>();
     protected ArrayList<LivingEntity> activeHordeMembers = new ArrayList<>();
-    protected final ServerBossEvent bossInfo = new ServerBossEvent(Component.literal("EntityTypeHorde"), BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.PROGRESS);
+    protected final ServerBossEvent bossInfo = new ServerBossEvent(Component.literal("EntityTypeHorde"), BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.NOTCHED_20);
     protected ArrayList<EntityTypeHordeData<?>> hordeData = new ArrayList<>();
     protected Boolean despawnLeftBehindMembers = true;
     ArrayList<Integer> spawnWeights = new ArrayList<>();

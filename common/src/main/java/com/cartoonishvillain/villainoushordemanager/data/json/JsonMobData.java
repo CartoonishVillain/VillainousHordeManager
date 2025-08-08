@@ -1,4 +1,4 @@
-package com.cartoonishvillain.villainoushordemanager.data;
+package com.cartoonishvillain.villainoushordemanager.data.json;
 
 import java.io.Serializable;
 

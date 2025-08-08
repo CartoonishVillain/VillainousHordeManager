@@ -1,6 +1,6 @@
 package com.cartoonishvillain.villainoushordemanager;
 
-import com.cartoonishvillain.villainoushordemanager.data.JsonHordeData;
+import com.cartoonishvillain.villainoushordemanager.data.json.JsonHordeData;
 import com.cartoonishvillain.villainoushordemanager.hordes.EntityEnumHorde;
 import com.cartoonishvillain.villainoushordemanager.hordes.EntityTypeHorde;
 import com.cartoonishvillain.villainoushordemanager.hordes.JsonHorde;

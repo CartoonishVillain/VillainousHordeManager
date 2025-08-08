@@ -1,7 +1,8 @@
-package com.cartoonishvillain.villainoushordemanager.data;
+package com.cartoonishvillain.villainoushordemanager.data.json;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
 
 public class JsonWaveData implements Serializable {
     String waveName;
@@ -12,6 +13,10 @@ public class JsonWaveData implements Serializable {
     String bossInfoText;
     String bossInfoColor;
     boolean despawnLeftBehindMembers;
+    boolean keepSpawningEnemiesWhileBossIsActive;
+    String bossInfoTextWhenBossIsActive;
+    String bossInfoColorWhenBossIsActive;
+    ArrayList<JsonMobData> bossMobData;
     ArrayList<JsonMobData> mobData;
 
     public String getWaveName() {
@@ -24,6 +29,14 @@ public class JsonWaveData implements Serializable {
 
     public Integer getKillsRequiredForEasy() {
         return killsRequiredForEasy;
+    }
+
+    public String getBossInfoTextWhenBossIsActive() {
+        return bossInfoTextWhenBossIsActive;
+    }
+
+    public String getBossInfoColorWhenBossIsActive() {
+        return bossInfoColorWhenBossIsActive;
     }
 
     public Integer getKillsRequiredForNormal() {
@@ -46,7 +59,15 @@ public class JsonWaveData implements Serializable {
         return despawnLeftBehindMembers;
     }
 
+    public boolean shouldKeepSpawningEnemiesWhileBossIsActive() {
+        return keepSpawningEnemiesWhileBossIsActive;
+    }
+
     public ArrayList<JsonMobData> getMobData() {
         return mobData;
+    }
+
+    public ArrayList<JsonMobData> getBossMobData() {
+        return bossMobData;
     }
 }

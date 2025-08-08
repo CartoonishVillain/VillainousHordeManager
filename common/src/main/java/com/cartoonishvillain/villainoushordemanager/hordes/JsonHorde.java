@@ -2,13 +2,17 @@ package com.cartoonishvillain.villainoushordemanager.hordes;
 
 import com.cartoonishvillain.villainoushordemanager.JsonHordeMovementGoal;
 import com.cartoonishvillain.villainoushordemanager.TypeHordeMovementGoal;
-import com.cartoonishvillain.villainoushordemanager.data.JsonMobData;
-import com.cartoonishvillain.villainoushordemanager.data.JsonWaveData;
+import com.cartoonishvillain.villainoushordemanager.VillainousHordeManager;
+import com.cartoonishvillain.villainoushordemanager.data.json.JsonMobData;
+import com.cartoonishvillain.villainoushordemanager.data.json.JsonWaveData;
 import com.cartoonishvillain.villainoushordemanager.hordedata.EntityTypeHordeData;
 import com.cartoonishvillain.villainoushordemanager.mixin.LivingGoalAccessor;
 import com.cartoonishvillain.villainoushordemanager.platform.Services;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
@@ -23,10 +27,25 @@ import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
+
+//TODO
+// * ADD IN INITIAL ADVANCEMENT DISTRIBUTION
+// * VERIFY BOSS LOGIC IS WORKING
+//    * DATA CREATION ======
+//    * Determine what a wave without a boss looks like json wise
+//    * Does it work without a boss?
+//    * Does it work with one boss?
+//    * Does it work with multiple bosses
+//    * FOR ALL DATA CASES ======
+//    * Does it work under ideal player conditions? (Player stands and fights in an open field with no spawn obstructions)
+//    * Does it work with bad spawning conditions? (Icy terrain or ocean with no land in sight)
+//    * Verify that advancements are given out appropriately when winning
+//    * If we're meant to revoke advancements, make sure that works too
+//    * WITH ONE OR MORE BOSSES ======
+//    * Does it work when the player unloads the entity (Both by using the built in unload system and by flying or teleporting out of simulation distance)
+//    * Does it work when the player pushes the entity into a portal?
+//    * Does it work when the player kills the entity normally.
 
 public class JsonHorde {
     protected ServerLevel world;
@@ -53,6 +72,20 @@ public class JsonHorde {
     protected ArrayList<Integer> spawnWeights = new ArrayList<>();
     protected int hordeWaveNumber = 0;
 
+    protected String advancementForStarting;
+    protected String advancementForWinning;
+    boolean shouldClearWinningAdvancement;
+
+    protected ArrayList<JsonMobData> bossEntities = new ArrayList<>();
+    protected ArrayList<JsonMobData> bossEntitiesTracked = new ArrayList<>();
+    protected ArrayList<JsonMobData> bossEntitiesSpawned = new ArrayList<>();
+    protected ServerBossEvent bossEventForBossEntities;
+    protected ArrayList<LivingEntity> activeBossMembers = new ArrayList<>();
+    protected boolean isSpawningBosses = false;
+    protected boolean bossPhase = false;
+    protected HashMap<PathfinderMob, JsonMobData> bossTracker = new HashMap<>();
+    protected boolean shouldBossKeepSpawningHorde = false;
+
     /**
      * The enum of reasons why the Horde may end.
      */
@@ -70,20 +103,41 @@ public class JsonHorde {
     public JsonHorde(
             MinecraftServer server,
             ArrayList<JsonWaveData> waves,
+            String advancementForStarting,
+            String advancementForWinning,
+            boolean shouldClearWinningAdvancement,
             String hordeName
     ) {
         this.server = server;
         this.waves = waves;
         this.hordeName = hordeName;
+        this.advancementForStarting = advancementForStarting;
+        this.advancementForWinning = advancementForWinning;
+        this.shouldClearWinningAdvancement = shouldClearWinningAdvancement;
         getDataFromWave(waves.getFirst(), false);
     }
 
+    /**
+     * Updates the horde with the new information for a new wave.
+     * @param waveData The wave data to pull from
+     * @param newWave True if the wave being pulled from is not the first wave
+     */
     private void getDataFromWave(JsonWaveData waveData, Boolean newWave) {
         easyKillCount = waveData.getKillsRequiredForEasy();
         normalKillCount = waveData.getKillsRequiredForNormal();
         hardKillCount = waveData.getKillsRequiredForHard();
         allowedActive = waveData.getMaximumActiveHordeMembers();
         BossEvent.BossBarColor bossColor = switch (waveData.getBossInfoColor().toLowerCase()) {
+            case "green" -> BossEvent.BossBarColor.GREEN;
+            case "blue" -> BossEvent.BossBarColor.BLUE;
+            case "pink" -> BossEvent.BossBarColor.PINK;
+            case "red" -> BossEvent.BossBarColor.RED;
+            case "purple" -> BossEvent.BossBarColor.PURPLE;
+            case "yellow" -> BossEvent.BossBarColor.YELLOW;
+            default -> BossEvent.BossBarColor.WHITE;
+        };
+
+        BossEvent.BossBarColor bossbossColor = switch (waveData.getBossInfoColorWhenBossIsActive().toLowerCase()) {
             case "green" -> BossEvent.BossBarColor.GREEN;
             case "blue" -> BossEvent.BossBarColor.BLUE;
             case "pink" -> BossEvent.BossBarColor.PINK;
@@ -116,6 +170,21 @@ public class JsonHorde {
                 Services.PLATFORM.getLOGGER().warn("VillainousHordeManager - Failed to load json mob of type: " + mobData.getMobID());
             }
         }
+
+        bossEntitiesTracked.clear();
+        bossEntitiesSpawned.clear();
+        bossEventForBossEntities = null;
+        activeBossMembers.clear();
+        isSpawningBosses = false;
+        bossPhase = false;
+        bossTracker.clear();
+        shouldBossKeepSpawningHorde = false;
+
+        bossEntities.addAll(waveData.getBossMobData());
+        bossEntitiesTracked.addAll(bossEntities);
+        bossEventForBossEntities = new ServerBossEvent(Component.literal(waveData.getBossInfoTextWhenBossIsActive()), bossbossColor, BossEvent.BossBarOverlay.PROGRESS);
+        shouldBossKeepSpawningHorde = waveData.shouldKeepSpawningEnemiesWhileBossIsActive();
+
         setHordeData(entityHordeDataList);
 
         spawnWeights = new ArrayList<>();
@@ -135,6 +204,22 @@ public class JsonHorde {
      * @param stopReason The code for why the error ended.
      */
     public void Stop(HordeStopReasons stopReason) {
+        try {
+            if (stopReason == HordeStopReasons.VICTORY && !advancementForWinning.isEmpty()) {
+                awardAdvancement(this.bossInfo.getPlayers(), advancementForWinning);
+            }
+
+            if (stopReason == HordeStopReasons.VICTORY && !advancementForWinning.isEmpty() && shouldClearWinningAdvancement) {
+                AdvancementHolder advancement = server.getAdvancements().get(ResourceLocation.parse(advancementForWinning));
+                for (ServerPlayer player : this.bossInfo.getPlayers()) {
+                    AdvancementProgress progress = player.getAdvancements().getOrStartProgress(advancement);
+                    for (String s : progress.getCompletedCriteria()) {
+                        player.getAdvancements().revoke(advancement, s);
+                    }
+                }
+            }
+        } catch (NullPointerException ignored) {}
+
         this.bossInfo.setVisible(false);
         bossInfo.removeAllPlayers();
         hordeActive = false;
@@ -146,13 +231,24 @@ public class JsonHorde {
         center = null;
         players.clear();
 
+        bossEntitiesTracked.clear();
+        bossEntitiesSpawned.clear();
+        bossEventForBossEntities = null;
+        activeBossMembers.clear();
+        isSpawningBosses = false;
+        bossPhase = false;
+        bossTracker.clear();
+        shouldBossKeepSpawningHorde = false;
+
+        advancementForWinning = "";
+        advancementForStarting = "";
+
         switch (stopReason) {
             case VICTORY -> Services.PLATFORM.getLOGGER().info("Player Victory against " + hordeName);
             case DEFEAT -> Services.PLATFORM.getLOGGER().info("Player Defeat against" + hordeName);
             case SPAWN_ERROR -> Services.PLATFORM.getLOGGER().error(hordeName + " canceled! Could not locate spawn placement! (Entities are too big, or terrain is too noisy)");
             case PEACEFUL -> Services.PLATFORM.getLOGGER().info(hordeName + " canceled, server changed to peaceful!");
         }
-
     }
 
     /**
@@ -161,7 +257,6 @@ public class JsonHorde {
     public Boolean getHordeActive() {
         return hordeActive;
     }
-
 
     /**
      * Initial phase. The EntityTypeHorde targets a specific player as it's anchor point (where horde members approach, and base their spawning off of)
@@ -182,6 +277,10 @@ public class JsonHorde {
                     case PEACEFUL -> {
                         return;
                     }
+                }
+
+                if (hordeActive == false && !advancementForStarting.isEmpty()) {
+                    awardAdvancement(List.of(serverPlayer), advancementForStarting);
                 }
 
                 setActiveMemberCount();
@@ -259,7 +358,8 @@ public class JsonHorde {
             center = hordeAnchorPlayer.getOnPos();
             updateCenter = 100;
             updatePlayers();
-            updateHorde();
+            if (!bossPhase || shouldBossKeepSpawningHorde) updateHorde();
+            if (bossPhase) updateBosses();
         } else {
             updateCenter--;
         }
@@ -270,7 +370,65 @@ public class JsonHorde {
      *   For additional or generally different functionality you can override this
      */
     public void tick() {
-        if (hordeActive) {
+        if (hordeActive && bossPhase) {
+            if (isSpawningBosses || !bossEntitiesTracked.isEmpty()) {
+                if (hordeAnchorPlayer.level().dimensionType().equals(world.dimensionType()) && checkIfPlayerIsStillValid(hordeAnchorPlayer)) {
+                    PeacefulCheck();
+                    if(!hordeActive) return;
+
+                    if (oldBossInfo != null) {
+                        oldBossInfo.setVisible(false);
+                        for (ServerPlayer player : oldBossInfo.getPlayers()) bossInfo.addPlayer(player);
+                        oldBossInfo.removeAllPlayers();
+                        oldBossInfo = null;
+                    }
+                    this.bossInfo.setVisible(true);
+
+                    //spawn entities as needed/keep horde ticking
+                    if (bossEntitiesSpawned.size() < bossEntitiesTracked.size()) { {
+                            PathfinderMob mob = spawnBossMember(bossEntitiesTracked.get(bossEntitiesSpawned.size()));
+                            if (mob != null) {
+                                bossTracker.put(mob, bossEntitiesSpawned.getLast());
+                            }
+                    }} else isSpawningBosses = false;
+
+                    if (shouldBossKeepSpawningHorde) {
+
+                        //Keeps Active counter updated
+                        if (Active != activeHordeMembers.size()) {
+                            Active = activeHordeMembers.size();
+                        }
+
+                        //If we have room to spawn more horde members, spawn more
+                        if (Active < allowedActive) {
+                            spawnHordeMember();
+                        }
+                    }
+
+                    //track entities
+                    updateCenter();
+
+                } else {
+                    //look for viable player, or cancel.
+                    updatePlayers();
+                    if (players.isEmpty()) {
+                        this.Stop(HordeStopReasons.DEFEAT);
+                    } else {
+                        bossInfo.removePlayer(hordeAnchorPlayer);
+                        hordeAnchorPlayer = players.get(0);
+                        players.remove(0);
+                    }
+                }
+            } else {
+                //We're no longer spawning bosses, and the activeBossMembers are dead. The battle is over.
+                bossPhase = false;
+                //clear the boss entities list so that we can move back to the normal logic to end this wave.
+                bossEntities.clear();
+            }
+        }
+
+        //Normal Horde phase
+        if (hordeActive && !bossPhase) {
             if (Alive > 0) {
                 if (hordeAnchorPlayer.level().dimensionType().equals(world.dimensionType()) && checkIfPlayerIsStillValid(hordeAnchorPlayer)) {
                     PeacefulCheck();
@@ -283,6 +441,7 @@ public class JsonHorde {
 
                     if (oldBossInfo != null) {
                         oldBossInfo.setVisible(false);
+                        for (ServerPlayer player : oldBossInfo.getPlayers()) bossInfo.addPlayer(player);
                         oldBossInfo.removeAllPlayers();
                         oldBossInfo = null;
                     }
@@ -304,7 +463,7 @@ public class JsonHorde {
                 } else {
                     //look for viable player, or cancel.
                     updatePlayers();
-                    if (players.size() == 0) {
+                    if (players.isEmpty()) {
                         this.Stop(HordeStopReasons.DEFEAT);
                     } else {
                         bossInfo.removePlayer(hordeAnchorPlayer);
@@ -312,6 +471,12 @@ public class JsonHorde {
                         players.remove(0);
                     }
                 }
+            } else if (!bossEntitiesTracked.isEmpty()) {
+                // If no alive tickets remain, and boss entities exist, start the boss phase;
+                bossPhase = true;
+                isSpawningBosses = true;
+                oldBossInfo = bossInfo;
+                bossInfo = bossEventForBossEntities;
             } else {
                 // if we've somehow surpassed, or are equal to the indexed size of the waves, we declare a victory over the horde
                 if (hordeWaveNumber >= waves.size()-1) {
@@ -388,6 +553,47 @@ public class JsonHorde {
             removal.remove(Entity.RemovalReason.DISCARDED);
         }
 
+        removals.clear();
+    }
+
+    private void updateBosses() {
+        ArrayList<LivingEntity> removals = new ArrayList<>();
+        ArrayList<LivingEntity> deleteMobs = new ArrayList<>();
+
+        for (LivingEntity hordeMember : activeBossMembers) {
+
+            if (hordeMember.isDeadOrDying()) {
+                removals.add(hordeMember);
+            } else if (hordeMember.isRemoved()) {
+                deleteMobs.add(hordeMember);
+            }
+
+            BlockPos hordeTarget = center;
+            if (Mth.sqrt((float) hordeMember.distanceToSqr(hordeTarget.getX(), hordeTarget.getY(), hordeTarget.getZ())) > 64) {
+                removeGoal((PathfinderMob) hordeMember);
+                if (despawnLeftBehindMembers) deleteMobs.add(hordeMember);
+            }
+        }
+
+        for (LivingEntity removal : removals) {
+            activeBossMembers.remove(removal);
+            bossEntitiesTracked.remove(bossTracker.get((PathfinderMob) removal));
+            bossTracker.remove((PathfinderMob) removal);
+        }
+
+        for (LivingEntity removal : deleteMobs) {
+            bossEntitiesSpawned.remove(bossTracker.get((PathfinderMob) removal));
+
+            //Cycle the removed entity to be the last index, since we need to spawn it again.
+            bossEntitiesTracked.remove(bossTracker.get((PathfinderMob) removal));
+            bossEntitiesTracked.add(bossTracker.get((PathfinderMob) removal));
+
+            activeBossMembers.remove(removal);
+            bossTracker.remove(removal);
+            removal.remove(Entity.RemovalReason.DISCARDED);
+        }
+
+        deleteMobs.clear();
         removals.clear();
     }
 
@@ -571,9 +777,8 @@ public class JsonHorde {
         while (hordeSpawn.isEmpty()) {
             hordeSpawn = this.getValidSpawn(entrySelected.getType());
             attempts++;
-            if (hordeSpawn.isEmpty() && attempts >= 5) {
-                this.Stop(HordeStopReasons.SPAWN_ERROR);
-                return;
+            if (hordeSpawn.isEmpty() && attempts >= 20) {
+                return; //Abort the spawning process after trying this much to free resources, try again on the next batch.
             }
         }
 
@@ -589,6 +794,52 @@ public class JsonHorde {
 
     }
 
+    protected PathfinderMob spawnBossMember(JsonMobData entity) {
+        Optional<BlockPos> hordeSpawn = Optional.empty();
+
+        Optional<EntityType<?>> type = EntityType.byString(entity.getMobID());
+        EntityTypeHordeData<?> entrySelected = new EntityTypeHordeData(
+                entity.getGoalPriority(),
+                entity.getGoalMovementSpeed(),
+                entity.getSpawnWeight(),
+                type.get(),
+                entity.getNbtData()
+        );
+
+        PathfinderMob pathfinderMob;
+
+        try {
+            pathfinderMob = entrySelected.createInstance(world);
+        } catch (ClassCastException e) {
+            this.Stop(HordeStopReasons.SPAWN_ERROR);
+            Services.PLATFORM.getLOGGER().error("Villainous Horde Manager - WARNING! One or more of the mobs in your JSON horde are not a descendant of PathfinderMob. Horde canceled due to this.");
+            return null;
+        }
+
+
+        int attempts = 0;
+        while (hordeSpawn.isEmpty()) {
+            hordeSpawn = this.getValidSpawn(entrySelected.getType());
+            attempts++;
+            if (hordeSpawn.isEmpty() && attempts >= 20) {
+                return null; //Abort the spawning process after trying this much to free resources, try again on the next batch.
+            }
+        }
+
+
+        if (pathfinderMob != null) {
+            pathfinderMob.setPos(hordeSpawn.get().getX(), hordeSpawn.get().getY(), hordeSpawn.get().getZ());
+            injectGoal(pathfinderMob, entrySelected, entrySelected.getGoalMovementSpeed());
+            Services.PLATFORM.finalizeSpawn(pathfinderMob, world, pathfinderMob.level().getCurrentDifficultyAt(pathfinderMob.getOnPos()), MobSpawnType.EVENT, null);
+            world.addFreshEntity(pathfinderMob);
+            SpawnUnit();
+            activeBossMembers.add(pathfinderMob);
+            bossEntitiesSpawned.add(entity);
+            return pathfinderMob;
+        }
+        return null;
+    }
+
     /**
      *   Returns the center of the EntityTypeHorde.
      */
@@ -600,7 +851,7 @@ public class JsonHorde {
      *   Checks if a given entity is in the roster of monsters.
      */
     public boolean isHordeMember(LivingEntity entity) {
-        return activeHordeMembers.contains(entity);
+        return activeHordeMembers.contains(entity) || activeBossMembers.contains(entity);
     }
 
     /**
@@ -612,7 +863,7 @@ public class JsonHorde {
     }
 
     /**
-     Removes the horde movement and swarming goal from the entity.
+     * Removes the horde movement and swarming goal from the entity.
      */
     public static void removeGoal(PathfinderMob entity) {
         GoalSelector mobGoalSelector = ((LivingGoalAccessor) entity).cartoonishHordeGetMobGoalSelector();
@@ -637,4 +888,15 @@ public class JsonHorde {
         hordeData.addAll(entityHordeData);
     }
 
+    private void awardAdvancement(Collection<ServerPlayer> playersToAward, String advancementToAward) {
+        AdvancementHolder advancement = server.getAdvancements().get(ResourceLocation.parse(advancementToAward));
+        for (ServerPlayer player : playersToAward) {
+            AdvancementProgress progress = player.getAdvancements().getOrStartProgress(advancement);
+            if (!progress.isDone()) {
+                for(String s : progress.getRemainingCriteria()) {
+                    player.getAdvancements().award(advancement, s);
+                }
+            }
+        }
+    }
 }

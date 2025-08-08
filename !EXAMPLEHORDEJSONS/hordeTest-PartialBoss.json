@@ -1,0 +1,71 @@
+[
+  {
+    "hordeName": "swarm1-PartialBoss",
+    "advancementForStartingHorde": "nether/find_bastion",
+    "advancementForWinningAgainstHorde": "nether/fast_travel",
+    "shouldClearWinningAdvancement": true,
+    "waves": [
+      {
+        "waveName": "wave1",
+        "maximumActiveHordeMembers": "8",
+        "killsRequiredForEasy": 15,
+        "killsRequiredForNormal": 30,
+        "killsRequiredForHard": 45,
+        "bossInfoText": "The swarm begins!",
+        "bossInfoColor": "red",
+        "despawnLeftBehindMembers": true,
+        "keepSpawningEnemiesWhileBossIsActive": false,
+        "bossInfoTextWhenBossIsActive": "The Painter?",
+        "bossInfoColorWhenBossIsActive": "white",
+        "bossMobData": [
+          {
+            "mobID": "minecraft:zombie",
+            "spawnWeight": 3,
+            "goalPriority": 2,
+            "goalMovementSpeed": 1,
+            "nbtData": "{CustomName:'{\"text\":\"I am going to crash your castle!\"}',CustomNameVisible:1,PersistenceRequired:1}"
+          }
+        ],
+        "mobData": [
+          {
+            "mobID": "minecraft:zombie",
+            "spawnWeight": 3,
+            "goalPriority": 2,
+            "goalMovementSpeed": 1,
+            "nbtData": "{CustomName:'{\"text\":\"Test Name\"}',CustomNameVisible:1,PersistenceRequired:1}"
+          }
+        ]
+      },
+      {
+        "waveName": "wave2",
+        "maximumActiveHordeMembers": "8",
+        "killsRequiredForEasy": 15,
+        "killsRequiredForNormal": 30,
+        "killsRequiredForHard": 45,
+        "bossInfoText": "Spooky Scary Skeletons!",
+        "bossInfoColor": "yellow",
+        "despawnLeftBehindMembers": true,
+        "keepSpawningEnemiesWhileBossIsActive": false,
+        "bossInfoTextWhenBossIsActive": "",
+        "bossInfoColorWhenBossIsActive": "white",
+        "bossMobData": [],
+        "mobData": [
+          {
+            "mobID": "minecraft:skeleton",
+            "spawnWeight": 3,
+            "goalPriority": 2,
+            "goalMovementSpeed": 1,
+            "nbtData": "{CustomName:'{\"text\":\"Scary!\"}',CustomNameVisible:1,PersistenceRequired:1}"
+          },
+          {
+            "mobID": "minecraft:wither_skeleton",
+            "spawnWeight": 2,
+            "goalPriority": 2,
+            "goalMovementSpeed": 1,
+            "nbtData": "{CustomName:'{\"text\":\"Spooky!\"}',CustomNameVisible:1,PersistenceRequired:1}"
+          }
+        ]
+      }
+    ]
+  }
+]

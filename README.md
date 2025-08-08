@@ -3,21 +3,32 @@
 The villainous horde manager (or villainous horde library) is a mod designed to help control horde events.
 
 There are two ways you can make your own horde events.
-* If you have a mod, and would like to directly integrate into the code base for greater control over the horde systems, you can extend the horde classes and follow the examples in the VillainousHordeManager file.
-* If you want a quick horde setup, you can follow the example set by hordeJsonData.json. Once the json is complete, you only need to place the file in the server/minecraft directory (just outside of the mods folder).
+* If you have a mod, and would like to directly integrate into the code base for greater control over the horde systems, feel free to extend on of the horde classes.
+* If you want a quick horde setup, you can follow the example set in the !EXAMPLEHORDEJSONS folder. Once a horde json is complete, you only need to place the file in the config folder, inside a subfolder called "villainoushordemanager"
   * When you do this, you can start your horde with /hordeManager startJsonHorde <hordeName>, if you have cheats enabled or operator level 2 permissions.
-  * The data in this case has precise requirements. If these are not followed, crashes or other assorted weird behavior may occur. Notes will be given per data point.
+  * The data in this case has precise requirements. If these are not followed, crashes or other assorted weird behavior may occur.
  
 ### Information points for hordes (most relevant to JSON hordes, but information can be helpful to all):
 * hordeName: The name that may appear in the logs for your horde, and the name you use to start the horde. (Should be one word, no spaces.)
-* maximumActiveHordeMembers: The mob spawn cap at a given moment for the horde. (Integer)
-* killsRequiredForEasy(/Normal/Hard): The amount of kills required, per difficulty, to triumph over the horde event. (Integer)
-* findSpawnAttempts: How many times should the game look for spawn points? The higher the number, the less likely you are to have hordes end randomly due to being unable to find a spawn point. Higher values will lead to potentially more resource usage in complex environments as it uses more time to find spawn points, though. (Integer)
-* bossInfoText: What is the label of the boss bar for the horde event?
-* bossInfoColor: What color is the boss bar?
-  * Only supports: green, blue, pink, red, purple, and yellow. Any other value will be white.
-* despawnLeftBehindMembers: An optimization toggle. If a user runs away from the horde members, and they end up out of range, do we despawn them? (true/false)
-* mobdata: An array of mob data, the structure of which is below.
+* advancementForStartingHorde: The resource location of an advancement to give the initial anchor player for starting the horde. Leave as an empty string for no advancement
+* advancementForWinningAgainstHorde: The resource location of an advancement to give to all players who are within range when a horde event is won.
+* shouldClearWinningAdvancement: A boolean, when true, the winning advancement is revoked after being awarded. If the advancement has awards attached, this allows repeatable rewards.
+* waves: An array of JsonWaveData objects, used to define the waves of a horde. At least one wave should be added.
+
+### Information for JsonWaveData
+* wavename: A string for the name of the wave, used internally, advised you make unique names.
+* maximumActiveHordeMembers: Integer, how many horde members should be spawned in at a given time?
+* killsRequiredForEasy: Integer, if on easy difficulty, how many kills are required to complete the wave?
+* killsRequiredForNormal: Integer, if on normal difficulty, how many kills are required to complete the wave?
+* killsRequiredForHard: Integer, if on normal difficulty, how many kills are required to complete the wave?
+* bossInfoText: String, The boss bar title of the wave
+* bossInfoColor: String, the boss bar color of the wave, options: green, blue, pink, red, purple, yellow, white
+* despawnLeftBehindMembers: Boolean, When horde entities are ran away from effectively, and are no longer tracked by the horde, should they despawn?
+* mobData: An array of mob data, see the horde member data entry below for more information
+* bossMobData: An array of mob data, when the players finish the wave, if any entities are defined, they are spawned in a boss phase, and the wave will not end until each boss entity is killed. Spawn weight is ignored, and every entry is spawned once (unless abandoned, then they'll respawn)
+* keepSpawningEnemiesWhileBossIsActive: Boolean, if the wave has a boss phase, should the main horde pool still spawn to support the boss?
+* bossInfoTextWhenBossIsActive: bossInfoText for the wave's boss phase
+* bossInfoColorWhenBossIsActive: bossInfoColor for the wave's boss phase
 
 ### Information for horde members and horde member data entry (also most relevant for JSON hordes, but information can be helpful to all):
 * mobID: the ID of a given mob, such as `minecraft:creeper` for creepers. (If the mob listed is not a pathfinding mob, the game *shouldn't* crash, but it could. Instead it should just end the horde with an error in the logs.)

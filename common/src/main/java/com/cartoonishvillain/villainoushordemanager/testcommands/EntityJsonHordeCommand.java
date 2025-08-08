@@ -1,9 +1,9 @@
 package com.cartoonishvillain.villainoushordemanager.testcommands;
 
 import com.cartoonishvillain.villainoushordemanager.VillainousHordeManager;
-import com.cartoonishvillain.villainoushordemanager.data.JsonHordeData;
-import com.cartoonishvillain.villainoushordemanager.data.JsonMobData;
-import com.cartoonishvillain.villainoushordemanager.data.JsonWaveData;
+import com.cartoonishvillain.villainoushordemanager.data.json.JsonHordeData;
+import com.cartoonishvillain.villainoushordemanager.data.json.JsonMobData;
+import com.cartoonishvillain.villainoushordemanager.data.json.JsonWaveData;
 import com.cartoonishvillain.villainoushordemanager.hordedata.EntityTypeHordeData;
 import com.cartoonishvillain.villainoushordemanager.hordes.JsonHorde;
 import com.cartoonishvillain.villainoushordemanager.platform.Services;
@@ -62,7 +62,14 @@ public class EntityJsonHordeCommand {
                     waveHordeMobData.put(wave.getWaveName(), hordeMobData);
                 }
 
-                VillainousHordeManager.jsonHorde = new JsonHorde(sourceStack.getServer(), jsonHordeData.getWaves(), jsonHordeData.getHordeName());
+                VillainousHordeManager.jsonHorde = new JsonHorde(
+                        sourceStack.getServer(),
+                        jsonHordeData.getWaves(),
+                        jsonHordeData.getAdvancementForStartingHorde(),
+                        jsonHordeData.getAdvancementForWinningAgainstHorde(),
+                        jsonHordeData.shouldClearWinningAdvancement(),
+                        jsonHordeData.getHordeName()
+                );
 
                 VillainousHordeManager.jsonHorde.SetUpHorde(Objects.requireNonNull(sourceStack.getPlayer()));
             } else {
@@ -97,7 +104,14 @@ public class EntityJsonHordeCommand {
                     waveHordeMobData.put(wave.getWaveName(), hordeMobData);
                 }
 
-                VillainousHordeManager.jsonHorde = new JsonHorde(sourceStack.getServer(), jsonHordeData.getWaves(), jsonHordeData.getHordeName());
+                VillainousHordeManager.jsonHorde = new JsonHorde(
+                        sourceStack.getServer(),
+                        jsonHordeData.getWaves(),
+                        jsonHordeData.getAdvancementForStartingHorde(),
+                        jsonHordeData.getAdvancementForWinningAgainstHorde(),
+                        jsonHordeData.shouldClearWinningAdvancement(),
+                        jsonHordeData.getHordeName()
+                );
 
                 VillainousHordeManager.jsonHorde.SetUpHorde(Objects.requireNonNull(player));
             } else {

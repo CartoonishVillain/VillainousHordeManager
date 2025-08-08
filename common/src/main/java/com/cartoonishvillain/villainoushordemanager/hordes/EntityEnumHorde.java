@@ -23,6 +23,12 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.*;
 
+/**
+ * This class is no longer going to be updated, aside to update any core procedures (new methods that should be used, general horde documentation)
+ * In the event that a compile error occurs, code will be commented out from this class instead of attempting to keep it alive.
+ * You may extend this class and make hordes to your hearts content still. But we will not be testing or further adding logic to this class.
+ */
+@Deprecated
 public abstract class EntityEnumHorde {
     protected ServerLevel world;
     protected BlockPos center;
